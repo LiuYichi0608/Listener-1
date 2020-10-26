@@ -39,7 +39,7 @@ public class ResultEntity {
      */
     public static ResultEntity success() {
         ResultEntity resultEntity = new ResultEntity();
-        resultEntity.setStatus(ResultCode.SUCCESS);
+        resultEntity.setStatus(ResultCodeEnum.SUCCESS.getCode());
         resultEntity.setMessage("success");
         return resultEntity;
     }
@@ -50,7 +50,7 @@ public class ResultEntity {
      */
     public static ResultEntity fail() {
         ResultEntity resultEntity = new ResultEntity();
-        resultEntity.setStatus(ResultCode.FAIL);
+        resultEntity.setStatus(ResultCodeEnum.FAIL.getCode());
         resultEntity.setMessage("fail");
         return resultEntity;
     }

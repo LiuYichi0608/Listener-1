@@ -1,7 +1,7 @@
 package com.loiterer.listener.user.controller;
 
 import com.loiterer.listener.common.exception.ListenerException;
-import com.loiterer.listener.common.result.ResultCode;
+import com.loiterer.listener.common.result.ResultCodeEnum;
 import com.loiterer.listener.common.result.ResultEntity;
 import com.loiterer.listener.user.query.UserQuery;
 import com.loiterer.listener.user.service.UserService;
@@ -35,7 +35,7 @@ public class UserController {
      */
     @RequestMapping("/error")
     public ResultEntity error() {
-        throw new ListenerException(ResultCode.FAIL, "自定义异常!");
+        throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "自定义异常!");
     }
 
     /**
