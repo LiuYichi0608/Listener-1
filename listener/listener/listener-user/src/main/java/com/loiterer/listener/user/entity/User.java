@@ -17,7 +17,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class User implements Serializable {
 
-    private static final long serialVersion = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 对应t_user表中的id字段
