@@ -1,7 +1,7 @@
 package com.loiterer.listener.common.handler;
 
 import com.loiterer.listener.common.exception.ListenerException;
-import com.loiterer.listener.common.result.ResultCode;
+import com.loiterer.listener.common.result.ResultCodeEnum;
 import com.loiterer.listener.common.result.ResultEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResultEntity notFountException(NoHandlerFoundException e) {
         log.error(e.getMessage());
-        return ResultEntity.fail().status(ResultCode.NOT_FOUND).message("404, 该请求无法处理!");
+        return ResultEntity.fail().status(ResultCodeEnum.NOT_FOUND.getCode()).message("404, 该请求无法处理!");
     }
 
     /**

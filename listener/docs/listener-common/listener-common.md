@@ -130,7 +130,7 @@ com.loiterer.listener.common.result。
 
 
 
-### 2、ResultCode
+### 2、ResultCodeEnum
 
 
 
@@ -148,13 +148,22 @@ com.loiterer.listener.common
 
 #### 属性
 
-+ Integer **SUCCESS** = 20000：成功状态码。
-+ Integer FAIL = 200001：失败状态码。
-+ Integer NOT_FOUND = 404：找不到处理该请求的handler(controller)的异常
++ Integer **code**：状态码的值。
 
 
 
-#### 该接口用法
+#### 枚举类对象
+
++ SUCCESS：成功状态码。
+  + code = 20000
++ FAIL：失败状态码。
+  + code = 20001
++ NOT_FOUND：找不到处理该请求的handler(controller)的异常
+  + code = 404
+
+
+
+#### 该枚举类用法
 
 
 
@@ -163,13 +172,13 @@ com.loiterer.listener.common
 ```java
     public static ResultEntity success() {
         ResultEntity resultEntity = new ResultEntity();
-        resultEntity.setStatus(ResultCode.SUCCESS);
+        resultEntity.setStatus(ResultCode.SUCCESS.getCode());
         resultEntity.setMessage("success");
         return resultEntity;
     }
 ```
 
-解释：这一段代码是ResultEntity里的代码，可以看到第三行用到了ResultCode的属性。
+解释：这一段代码是ResultEntity里的代码，可以看到第三行用到了ResultCodeEnum的属性。
 
 
 
@@ -223,7 +232,7 @@ java.lang.RuntimeException
      */
     @RequestMapping("/error")
     public ResultEntity error() {
-        throw new ListenerException(ResultCode.FAIL, "自定义异常!");
+        throw new ListenerException(ResultCode.FAIL.getCode(), "自定义异常!");
     }
 ```
 
