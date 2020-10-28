@@ -1,90 +1,105 @@
 package com.loiterer.listener.user.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.loiterer.listener.user.entity.User;
+import com.google.gson.Gson;
+import com.loiterer.listener.common.util.JwtUtil;
+import com.loiterer.listener.common.util.RedisUtil;
 import com.loiterer.listener.user.mapper.UserMapper;
-import com.loiterer.listener.user.query.UserQuery;
+import com.loiterer.listener.user.model.dto.LoginDTO;
+import com.loiterer.listener.user.model.dto.UserInfoDTO;
+import com.loiterer.listener.user.model.entity.WeChatSession;
 import com.loiterer.listener.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.client.RestTemplate;
 
 /**
- * @author XieZhiJie
- * @date 2020/10/24 21:30
+ * 用户的 service 实现层
+ *
+ * @author cmt
+ * @date 2020/10/21
  */
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserMapper userMapper;
-
     @Autowired
-    public UserServiceImpl(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
+    private UserMapper userMapper;
+    @Autowired
+    private RedisUtil redisUtil;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Value("${loiterer.listener.app-id}")
+    private String appId;
+    @Value("${loiterer.listener.app-secret}")
+    private String appSecret;
 
     @Override
-    public List<User> findAll() {
-        return userMapper.selectAll();
-    }
+    public LoginDTO login(String code) {
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + appId + "&secret=" + appSecret
+                + "&js_code=" + code + "&grant_type=authorization_code";
 
-    @Override
-    public Map<String, Object> pageList(Long page, Long limit) {
-        Page<User> userPage = new Page<>(page, limit);
-        // 第二个参数传入null代表没有查询条件
-        userMapper.selectPage(userPage, null);
-        return pageToMap(userPage);
-    }
+        // 使用 RestTemplate 调用第三方接口
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+        if (responseEntity != null && responseEntity.getStatusCode() == HttpStatus.OK) {
+            Gson gson = new Gson();
+            WeChatSession weChatSession = gson.fromJson(responseEntity.getBody(), WeChatSession.class);
 
-    @Override
-    public Map<String, Object> pageList(Long page, Long limit, UserQuery userQuery) {
-        Page<User> userPage = new Page<>(page, limit);
-
-        // 没有查询信息的时候
-        if (userQuery == null) {
-            userMapper.selectPage(userPage, null);
-            return pageToMap(userPage);
+            String openid = weChatSession.getOpenid();
+            // 请求微信授权成功
+            if (StringUtils.isEmpty(weChatSession.getErrcode())) {
+                // 生成 token
+                String token = jwtUtil.getToken();
+                if (redisUtil.hasKey(RedisUtil.USER_KEY_PREFIX + openid)) {
+                    // openid 存在，根据 openid 更新 token
+                    userMapper.updateToken(openid, token);
+                } else {
+                    // openid 不存在，为第一次登录：插入 openid 和 token
+                    userMapper.insertOpenidAndToken(openid, token);
+                    redisUtil.set(RedisUtil.USER_KEY_PREFIX + openid, weChatSession.getSession_key());
+                }
+                return new LoginDTO(openid, token);
+            }
         }
-
-        // 查询信息
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-
-        // 查询信息
-        String name = userQuery.getName();
-        Integer age = userQuery.getAge();
-
-        // 当name有查询信息的时候
-        if (!StringUtils.isEmpty(name)) {
-            wrapper.like("name", userQuery.getName());
-        }
-
-        // 当age有查询信息的时候
-        if (userQuery.getAge() != null) {
-            wrapper.eq("age", age);
-        }
-
-        userMapper.selectPage(userPage, wrapper);
-
-        return pageToMap(userPage);
+        return null;
     }
 
     /**
-     * 当前类的将page的信息转化为map的共同代码块
-     * @param userPage 查询出的page信息
-     * @return         返回一个map集合
+     * 插入用户信息
+     *
+     * @param userInfoDTO 用户信息
+     * @param token       token
      */
-    private Map<String, Object> pageToMap(Page<User> userPage) {
-        Map<String, Object> data = new HashMap<>(4);
-        data.put("pageList", userPage.getRecords());
-        data.put("total", userPage.getTotal());
-        data.put("size", userPage.getSize());
-        data.put("current", userPage.getCurrent());
-        return data;
+    @Override
+    public UserInfoDTO insertUserInfo(UserInfoDTO userInfoDTO, String token) {
+        userMapper.insertUserInfo(userInfoDTO, token);
+        System.out.println("service userInfo: " + userInfoDTO.toString());
+        return userInfoDTO;
     }
 
+    /**
+     * 修改用户昵称
+     *
+     * @param nickName 用户昵称
+     * @param token    token
+     */
+    @Override
+    public void updateNickName(String nickName, String token) {
+        userMapper.updateNickName(nickName, token);
+    }
+
+    /**
+     * 查询用户信息
+     *
+     * @param token
+     * @return
+     */
+    @Override
+    public UserInfoDTO selectUserInfo(String token) {
+        return userMapper.selectUserInfo(token);
+    }
 }
