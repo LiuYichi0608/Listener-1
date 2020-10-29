@@ -12,7 +12,7 @@ spring:
   datasource:
     name: listener-db
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.112.101.204:3306/test?serverTimezone=CTT&useUnicode=true&characterEncoding=UTF8
+    url: jdbc:mysql://47.112.101.204:3306/listener?serverTimezone=CTT&useUnicode=true&characterEncoding=UTF8
     username: root
     password: ENC(r27PCZ7dxDJzgSk/zamd2KlJ5RGOxgQd8HotERRXnBA=)
   redis:
@@ -55,3 +55,14 @@ jasypt:
     # 加密算法设置 3.0.0 以后
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
+
+loiterer:
+  listener:
+    # 小程序id
+    app-id: ENC(bxzMPtb4ok6vB8Ph5NdLG4sD2QXTPQ/w6KZSTqYwmDw=)
+    # 小程序秘钥
+    app-secret: ENC(lb5z1nDbTXEiwrQmUSR8R14Sy+g5oJ0JZ87uBFeJK5Wf8o8qyB6js/M/z8E2/i4N)
+
+jwt:
+  token:
+    secret: ENC(ezkOdz+g5UczfIqAfXSx/P6XO/bIoaePEhkpGTH8siAtb11zH2oEEfJX9IRFM5Km)

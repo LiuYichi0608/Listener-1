@@ -1,39 +1,45 @@
 package com.loiterer.listener.user.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.loiterer.listener.user.entity.User;
-import com.loiterer.listener.user.query.UserQuery;
-
-import java.util.List;
-import java.util.Map;
+import com.loiterer.listener.user.model.dto.LoginDTO;
+import com.loiterer.listener.user.model.dto.UserInfoDTO;
 
 /**
- * @author XieZhiJie
- * @date 2020/10/24 21:30
+ * 用户的 service 层
+ *
+ * @author cmt
+ * @date 2020/10/21
  */
 public interface UserService {
 
     /**
-     * 查找所有user
-     * @return 返回带有所有user的列表
+     * 用户登录
+     *
+     * @param code 用户登录凭证
+     * @return 返回 openid 和 token
      */
-    List<User> findAll();
+    LoginDTO login(String code);
 
     /**
-     * 获取User列表并分页
-     * @param page  当前页
-     * @param limit 每页多少数据
-     * @return      返回分页信息的一个map集合
+     * 插入用户信息
+     *
+     * @param userInfoDTO 用户信息
+     * @param token       token
      */
-    Map<String, Object> pageList(Long page, Long limit);
+    UserInfoDTO insertUserInfo(UserInfoDTO userInfoDTO, String token);
 
     /**
-     * 获取User列表并分页
-     * @param page      当前页
-     * @param limit     每页多少数据
-     * @param userQuery name模糊查询和age等值查询的数据
-     * @return          返回分页信息的一个map集合
+     * 修改用户昵称
+     *
+     * @param nickName 用户昵称
+     * @param token    token
      */
-    Map<String, Object> pageList(Long page, Long limit, UserQuery userQuery);
+    void updateNickName(String nickName, String token);
 
+    /**
+     * 查询用户信息
+     *
+     * @param token
+     * @return 返回用户信息
+     */
+    UserInfoDTO selectUserInfo(String token);
 }
