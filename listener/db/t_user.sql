@@ -1,0 +1,9 @@
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (1, '张三', 21);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (2, '李四', 22);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (3, '王五', 23);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (4, 'Tom', 24);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (5, 'Jerry', 25);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (6, 'Lucy', 26);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (7, 'Bob', 22);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (8, '张四', 23);
+INSERT INTO `t_user` (`id`, `name`, `age`) VALUES (9, '赵大', 24);
