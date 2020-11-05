@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MybatisPlusConfig {
 
+
+
     /**
      * 配置分页插件
      * @return 返回分页插件
