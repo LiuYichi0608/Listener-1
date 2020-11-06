@@ -85,10 +85,7 @@ public class CodeGenerator {
         // 5、策略配置
         StrategyConfig strategy = new StrategyConfig();
         strategy.setInclude(
-                "t_draft_box",
-                "t_envelope_style",
-                "t_recipient_box",
-                "t_writer_box"
+                "t_letter"
         );  // 表名
         strategy.setNaming(NamingStrategy.underline_to_camel);  // 数据库表映射到实体的命名策略
         strategy.setTablePrefix("t" + "_");  // 生成实体时去掉表前缀

@@ -1,6 +1,6 @@
 package com.loiterer.listener.letter.service.impl;
 
-import com.loiterer.listener.letter.entity.EnvelopeStyle;
+import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
 import com.loiterer.listener.letter.mapper.EnvelopeStyleMapper;
 import com.loiterer.listener.letter.service.EnvelopeStyleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

@@ -2,7 +2,7 @@ package com.loiterer.listener.letter.controller;
 
 
 import com.loiterer.listener.common.result.ResultEntity;
-import com.loiterer.listener.letter.entity.EnvelopeStyle;
+import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
 import com.loiterer.listener.letter.service.EnvelopeStyleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
