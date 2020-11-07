@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
             // 请求微信授权成功
             if (StringUtils.isEmpty(weChatSession.getErrcode())) {
                 // 生成 token
-                String token = jwtUtil.getToken();
+                String token = jwtUtil.getToken(openid);
                 if (redisUtil.hasKey(RedisUtil.USER_KEY_PREFIX + openid)) {
                     // openid 存在，根据 openid 更新 token
                     userMapper.updateToken(openid, token);
