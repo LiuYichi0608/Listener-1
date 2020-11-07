@@ -12,14 +12,14 @@
     </resultMap>
 
     <!-- 插入openid -->
-    <insert id="insertOpenidAndToken">
-        INSERT INTO t_user SET openid = #{openid}, token = #{token}
+    <insert id="insertOpenid">
+        INSERT INTO t_user SET openid = #{openid}
     </insert>
 
-    <!-- 更新 token -->
-    <update id="updateToken">
-        UPDATE t_user SET token = #{token} WHERE openid = #{openid}
-    </update>
+    <!-- 判断 openid 是否存在 -->
+    <select id="isOpenidExists" resultType="String">
+        SELECT openid FROM t_user WHERE openid = #{openid}
+    </select>
 
     <!-- 插入用户数据 -->
     <update id="insertUserInfo" useGeneratedKeys="true" keyProperty="userInfo.id">
@@ -32,12 +32,12 @@
           province = #{userInfo.province},
           city = #{userInfo.city}
         </set>
-        WHERE token = #{token}
+        WHERE openid = #{openid}
     </update>
 
     <!-- 修改用户昵称 -->
     <update id="updateNickName">
-        UPDATE t_user SET nick_name = #{nickName} WHERE token = #{token}
+        UPDATE t_user SET nick_name = #{nickName} WHERE openid = #{openid}
     </update>
 
     <!-- 查询用户信息 -->
@@ -51,6 +51,6 @@
           province,
           city
         FROM t_user
-        WHERE token = #{token}
+        WHERE openid = #{openid}
     </select>
 </mapper>

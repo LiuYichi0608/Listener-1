@@ -15,7 +15,7 @@ public interface UserService {
      * 用户登录
      *
      * @param code 用户登录凭证
-     * @return 返回 openid 和 token
+     * @return     返回 openid 和 token
      */
     LoginDTO login(String code);
 
@@ -24,6 +24,7 @@ public interface UserService {
      *
      * @param userInfoDTO 用户信息
      * @param token       token
+     * @return            返回用户信息
      */
     UserInfoDTO insertUserInfo(UserInfoDTO userInfoDTO, String token);
 
@@ -38,8 +39,8 @@ public interface UserService {
     /**
      * 查询用户信息
      *
-     * @param token
-     * @return 返回用户信息
+     * @param token token
+     * @return      返回用户信息
      */
     UserInfoDTO selectUserInfo(String token);
 }

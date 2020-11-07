@@ -44,8 +44,4 @@ public class User {
      * 微信用户唯一标识
      */
     private String openid;
-    /**
-     * token
-     */
-    private String token;
 }

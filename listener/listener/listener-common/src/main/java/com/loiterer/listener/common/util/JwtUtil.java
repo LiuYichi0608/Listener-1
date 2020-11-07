@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.loiterer.listener.common.exception.ListenerException;
 import com.loiterer.listener.common.result.ResultCodeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +28,6 @@ public class JwtUtil {
      */
     @Value("${jwt.token.secret}")
     private String secret;
-
-    private static DecodedJWT jwt;
 
     /**
      * 生成签名
@@ -62,7 +59,7 @@ public class JwtUtil {
     public void verify(String token) throws JWTVerificationException {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTVerifier verifier = JWT.require(algorithm).build();
-        jwt = verifier.verify(token);
+        verifier.verify(token);
     }
 
     /**
@@ -70,10 +67,11 @@ public class JwtUtil {
      *
      * @return 返回openid
      */
-    public String getOpenid() {
-        // 防止jwtUtil从token中获取openid失败
+    public String getOpenid(String token) {
+        // 防止 jwtUtil 从 token 中获取 openid 失败
         try {
-            return jwt.getClaims()
+            return JWT.decode(token)
+                    .getClaims()
                     .get("openid")
                     .asString();
         } catch (NullPointerException e) {

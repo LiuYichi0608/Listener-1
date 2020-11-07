@@ -66,10 +66,10 @@ public class UserController {
      */
     @GetMapping("/updateNickname")
     public ResultEntity updateNickName(HttpServletRequest request, @RequestParam("nickName") String nickName) {
-        String token = request.getHeader("token");
         if (StringUtils.isEmpty(nickName) || nickName.length() > 10) {
             return ResultEntity.fail().message("昵称不能为空且昵称长度需小于10");
         }
+        String token = request.getHeader("token");
         userService.updateNickName(nickName, token);
         return ResultEntity.success();
     }
@@ -78,7 +78,7 @@ public class UserController {
      * 查询用户信息; Header 中需要携带token
      *
      * @param request http请求对象
-     * @return 返回用户信息
+     * @return        返回用户信息
      */
     @GetMapping("/selectUserInfo")
     public ResultEntity selectUserInfo(HttpServletRequest request) {
