@@ -1,87 +1,89 @@
 package com.loiterer.listener.user.controller;
 
-import com.loiterer.listener.common.exception.ListenerException;
-import com.loiterer.listener.common.result.ResultCodeEnum;
 import com.loiterer.listener.common.result.ResultEntity;
-import com.loiterer.listener.user.query.UserQuery;
+import com.loiterer.listener.user.model.dto.LoginDTO;
+import com.loiterer.listener.user.model.dto.UserInfoDTO;
 import com.loiterer.listener.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author XieZhiJie
- * @date 2020/10/24 21:33
+ * 用户的 controller 层
+ *
+ * @author cmt
+ * @date 2020/10/21
  */
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
 
-    private final UserService userService;
-
-    private final RedisTemplate<String, String> redisTemplate;
-
     @Autowired
-    public UserController(UserService userService, RedisTemplate<String, String> redisTemplate) {
-        this.userService = userService;
-        this.redisTemplate = redisTemplate;
+    private UserService userService;
+
+    /**
+     * 用户登录
+     *
+     * @param code 登录凭证
+     * @return 如果登录成功，则返回 openid 和 token；否则返回错误信息
+     */
+    @PostMapping("/login")
+    public ResultEntity login(@RequestParam("code") String code) {
+        if (StringUtils.isEmpty(code)) {
+            return ResultEntity.fail().message("登录凭证code为空");
+        }
+
+        LoginDTO loginDTO = userService.login(code);
+        if (loginDTO == null) {
+            return ResultEntity.fail().message("请求微信授权获取openid失败");
+        }
+        return ResultEntity.success().data("loginDTO", loginDTO);
     }
 
     /**
-     * 抛出错误的一个测试接口
-     * @return 返回一个错误
+     * 插入用户信息; Header 中需要携带token
+     *
+     * @param request     http请求对象
+     * @param userInfoDTO 用户信息
      */
-    @RequestMapping("/error")
-    public ResultEntity error() {
-        throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "自定义异常!");
+    @PostMapping("/insertUserInfo")
+    public ResultEntity insertUserInfo(HttpServletRequest request, UserInfoDTO userInfoDTO) {
+        log.info(userInfoDTO.toString());
+        String token = request.getHeader("token");
+        UserInfoDTO userInfo = userService.insertUserInfo(userInfoDTO, token);
+        return ResultEntity.success().data("userInfo", userInfo);
     }
 
     /**
-     * 分页测试, 包括姓名模糊查询和年龄等值查询
-     * @param page      当前页
-     * @param limit     一页多少数据
-     * @param userQuery 查询信息
-     * @return          返回查询到的信息
+     * 修改用户昵称; Header 中需要携带token
+     *
+     * @param request  http请求对象
+     * @param nickName 用户昵称
      */
-    @PostMapping("/page/{page}/{limit}")
-    public ResultEntity page(
-            @PathVariable("page") Long page,
-            @PathVariable("limit") Long limit,
-            @RequestBody(required = false) UserQuery userQuery
-            ) {
-        // 还需要做参数校验, 我没做
-        Map<String, Object> data = userService.pageList(page, limit, userQuery);
-        return ResultEntity.success().data(data);
+    @GetMapping("/updateNickname")
+    public ResultEntity updateNickName(HttpServletRequest request, @RequestParam("nickName") String nickName) {
+        if (StringUtils.isEmpty(nickName) || nickName.length() > 10) {
+            return ResultEntity.fail().message("昵称不能为空且昵称长度需小于10");
+        }
+        String token = request.getHeader("token");
+        userService.updateNickName(nickName, token);
+        return ResultEntity.success();
     }
 
     /**
-     * 分页测试
-     * @param page  当前页
-     * @param limit 每页多少数据
-     * @return      返回前端数据
+     * 查询用户信息; Header 中需要携带token
+     *
+     * @param request http请求对象
+     * @return        返回用户信息
      */
-    @GetMapping("/page/{page}/{limit}")
-    public ResultEntity page(
-            @PathVariable("page") Long page,
-            @PathVariable("limit") Long limit
-    ) {
-        Map<String, Object> data = userService.pageList(page, limit);
-
-        return ResultEntity.success().data(data);
+    @GetMapping("/selectUserInfo")
+    public ResultEntity selectUserInfo(HttpServletRequest request) {
+        String token = request.getHeader("token");
+        UserInfoDTO userInfoDTO = userService.selectUserInfo(token);
+        return ResultEntity.success().data("userInfo", userInfoDTO);
     }
-
-    /**
-     * 用于测试能够获得mysql和redis数据库的数据并返回
-     * Get提交方式
-     * @return 返回数据
-     */
-    @RequestMapping("/findAll")
-    public ResultEntity findAll() {
-        return ResultEntity.success()
-                .data("mysqlData", userService.findAll())
-                .data("redisData", redisTemplate.opsForValue().get("a"));
-    }
-
 }

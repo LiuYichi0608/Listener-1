@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
     public ResultEntity error(Exception e) {
         log.error(e.getMessage());
         // 因为目前是测试阶段, 因此直接将e.getMessage返回前端, 方便看是什么错
-        return ResultEntity.fail().message(e.getMessage());
+        return ResultEntity.fail().message("出现了无法处理的错误, 请查看日志!");
     }
 
 }
