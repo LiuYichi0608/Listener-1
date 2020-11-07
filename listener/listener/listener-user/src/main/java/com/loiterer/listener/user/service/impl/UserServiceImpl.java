@@ -54,12 +54,10 @@ public class UserServiceImpl implements UserService {
             if (StringUtils.isEmpty(weChatSession.getErrcode())) {
                 // 生成 token
                 String token = jwtUtil.getToken(openid);
-                if (redisUtil.hasKey(RedisUtil.USER_KEY_PREFIX + openid)) {
-                    // openid 存在，根据 openid 更新 token
-                    userMapper.updateToken(openid, token);
-                } else {
-                    // openid 不存在，为第一次登录：插入 openid 和 token
-                    userMapper.insertOpenidAndToken(openid, token);
+                if (StringUtils.isEmpty(userMapper.isOpenidExists(openid))) {
+                    // openid 不存在，为第一次登录：插入 openid
+                    userMapper.insertOpenid(openid);
+                    // 以 openid 为 key，将 session_key 存入 redis
                     redisUtil.set(RedisUtil.USER_KEY_PREFIX + openid, weChatSession.getSession_key());
                 }
                 return new LoginDTO(openid, token);
@@ -72,11 +70,10 @@ public class UserServiceImpl implements UserService {
      * 插入用户信息
      *
      * @param userInfoDTO 用户信息
-     * @param token       token
      */
     @Override
     public UserInfoDTO insertUserInfo(UserInfoDTO userInfoDTO, String token) {
-        userMapper.insertUserInfo(userInfoDTO, token);
+        userMapper.insertUserInfo(userInfoDTO, jwtUtil.getOpenid(token));
         System.out.println("service userInfo: " + userInfoDTO.toString());
         return userInfoDTO;
     }
@@ -85,21 +82,19 @@ public class UserServiceImpl implements UserService {
      * 修改用户昵称
      *
      * @param nickName 用户昵称
-     * @param token    token
      */
     @Override
     public void updateNickName(String nickName, String token) {
-        userMapper.updateNickName(nickName, token);
+        userMapper.updateNickName(nickName, jwtUtil.getOpenid(token));
     }
 
     /**
      * 查询用户信息
      *
-     * @param token
      * @return
      */
     @Override
     public UserInfoDTO selectUserInfo(String token) {
-        return userMapper.selectUserInfo(token);
+        return userMapper.selectUserInfo(jwtUtil.getOpenid(token));
     }
 }
