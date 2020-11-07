@@ -15,6 +15,11 @@ public class LetterVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 信的id
+     */
+    private Integer id;
+
+    /**
      * 信的标题
      */
     private String title;

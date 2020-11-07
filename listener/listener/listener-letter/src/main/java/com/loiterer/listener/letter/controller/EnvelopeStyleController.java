@@ -45,7 +45,7 @@ public class EnvelopeStyleController {
     ) {
         // 参数校验
         if (!ParameterVerificationUtil.isInt(id)) {
-            return ResultEntity.fail().message("请输入正整数!");
+            return ResultEntity.fail().message("请输入整数!");
         }
         EnvelopeStyle envelopeStyle = envelopeStyleService.getById(id);
         return ResultEntity.success().data("envelopeStyle", envelopeStyle);

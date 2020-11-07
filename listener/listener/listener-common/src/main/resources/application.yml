@@ -57,6 +57,13 @@ mybatis-plus:
     # 开启以下配置, 打印mapper的日志, 查看sql语句
     # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+# 日志级别打印
+logging:
+  level:
+    com:
+      loiterer:
+        listener: debug
+
 # 对配置文件中的信息进行加密操作
 # jasypt 密码加密配置
 jasypt:

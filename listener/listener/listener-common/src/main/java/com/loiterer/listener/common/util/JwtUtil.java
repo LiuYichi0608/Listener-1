@@ -5,6 +5,9 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.loiterer.listener.common.exception.ListenerException;
+import com.loiterer.listener.common.result.ResultCodeEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +20,7 @@ import java.util.Date;
  * @author cmt
  * @date 2020/10/21
  */
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -34,9 +38,9 @@ public class JwtUtil {
      * @return 返回 token
      */
     public String getToken(String openid) {
-        // 设置 token 过期时间为1天
+        // 设置 token 过期时间为7天
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE,1);
+        calendar.add(Calendar.DATE, 7);
 
         return JWT.create()
                 // 声明 openid
@@ -67,8 +71,14 @@ public class JwtUtil {
      * @return 返回openid
      */
     public String getOpenid() {
-        return jwt.getClaims()
-                .get("openid")
-                .asString();
+        // 防止jwtUtil从token中获取openid失败
+        try {
+            return jwt.getClaims()
+                    .get("openid")
+                    .asString();
+        } catch (NullPointerException e) {
+            log.error(e.getMessage() + "||" + "token获取用户信息失败!");
+            throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "token获取用户信息失败!");
+        }
     }
 }

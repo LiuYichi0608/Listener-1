@@ -17,7 +17,7 @@ public class ServiceMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         // 当插入信息的时候, 插入当前日期
-        this.setFieldValByName("createTime", new Date(), metaObject);
+        this.setFieldValByName("gmtCreate", new Date(), metaObject);
     }
 
     @Override

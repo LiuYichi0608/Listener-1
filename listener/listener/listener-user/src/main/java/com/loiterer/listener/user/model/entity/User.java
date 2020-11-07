@@ -1,5 +1,6 @@
 package com.loiterer.listener.user.model.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Data;
  * @author cmt
  * @date 2020/10/21
  */
+@TableName("t_user")
 @Data
 public class User {
     /**

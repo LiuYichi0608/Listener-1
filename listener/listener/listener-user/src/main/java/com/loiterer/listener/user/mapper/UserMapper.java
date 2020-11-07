@@ -1,11 +1,15 @@
 package com.loiterer.listener.user.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.loiterer.listener.user.model.dto.UserInfoDTO;
+import com.loiterer.listener.user.model.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
+@Repository
 @Mapper
-public interface UserMapper {
+public interface UserMapper extends BaseMapper<User> {
 
     /**
      * 新用户注册时，插入 openid 和 token
