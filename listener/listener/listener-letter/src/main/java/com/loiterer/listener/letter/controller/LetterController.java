@@ -1,6 +1,5 @@
 package com.loiterer.listener.letter.controller;
 
-
 import com.loiterer.listener.common.result.ResultEntity;
 import com.loiterer.listener.common.util.JwtUtil;
 import com.loiterer.listener.letter.model.vo.LetterVO;
@@ -12,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -45,17 +46,19 @@ public class LetterController {
     /**
      * 用于在mysql数据库中添加一条信件信息
      * @param letterVO 前端传来的需要保存的信件信息
+     * @param request  从请求头中获取token
      * @return         返回成功信息
      */
     @PostMapping("/add/letter")
     public ResultEntity addLetter(
-            @RequestBody LetterVO letterVO
+            @RequestBody LetterVO letterVO,
+            HttpServletRequest request
     ) {
 
         log.debug("信件的信息: {}", letterVO);
 
-        // 从token中获取openid
-        String openid = jwtUtil.getOpenid();
+        // 从token中获取openid(不用考虑token不存在的情况, 不存在就被拦下了)
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
 
         log.debug("用户的openid为: {}", openid);
 
@@ -67,7 +70,5 @@ public class LetterController {
         // 当保存信件成功后
         return ResultEntity.success().message("发送信件成功!");
     }
-
-
 
 }
