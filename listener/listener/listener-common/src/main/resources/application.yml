@@ -12,9 +12,20 @@ spring:
   datasource:
     name: listener-db
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.112.101.204:3306/listener?serverTimezone=CTT&useUnicode=true&characterEncoding=UTF8
+    url: jdbc:mysql://47.112.101.204:3306/test_listerner?serverTimezone=CTT&useUnicode=true&characterEncoding=UTF8
     username: root
     password: ENC(r27PCZ7dxDJzgSk/zamd2KlJ5RGOxgQd8HotERRXnBA=)
+#    hikari:
+#      # 最小空闲连接
+#      minimum-idle: 10
+#      # 最大连接数
+#      maximum-pool-size: 20
+#      # 空闲连接超时时间
+#      idle-timeout: 500000
+#      # 连接最大存活时间
+#      max-lifetime: 540000
+#      # 连接超时时间
+#      connection-timeout: 60000
   redis:
     host: 47.112.101.204
     port: 6379
@@ -45,6 +56,13 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     # 开启以下配置, 打印mapper的日志, 查看sql语句
     # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志级别打印
+logging:
+  level:
+    com:
+      loiterer:
+        listener: debug
 
 # 对配置文件中的信息进行加密操作
 # jasypt 密码加密配置
