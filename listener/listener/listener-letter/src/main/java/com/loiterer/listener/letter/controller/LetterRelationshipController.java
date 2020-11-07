@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * <p>
  *  前端控制器
- *  草稿
  * </p>
  *
  * @author xzj
- * @since 2020-11-05
+ * @since 2020-11-06
  */
 @RestController
-@RequestMapping("/letter/draft-box")
-public class DraftBoxController {
+@RequestMapping("/letter/letter-relationship")
+public class LetterRelationshipController {
+
+
 
 }
 

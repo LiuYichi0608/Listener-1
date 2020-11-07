@@ -1,5 +1,7 @@
 package com.loiterer.listener.common.handler;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.loiterer.listener.common.exception.ListenerException;
 import com.loiterer.listener.common.result.ResultCodeEnum;
 import com.loiterer.listener.common.util.JwtUtil;
@@ -28,7 +30,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         try {
             jwtUtil.verify(token);
             return true;
-        } catch (Exception e) {
+        } catch (TokenExpiredException e) {
+            throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "token已过期");
+        } catch (JWTVerificationException e) {
             throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "验证token失败");
         }
     }

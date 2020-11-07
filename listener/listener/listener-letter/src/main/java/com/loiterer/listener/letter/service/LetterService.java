@@ -1,6 +1,6 @@
 package com.loiterer.listener.letter.service;
 
-import com.loiterer.listener.letter.entity.RecipientBox;
+import com.loiterer.listener.letter.model.entity.Letter;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author xzj
- * @since 2020-11-05
+ * @since 2020-11-06
  */
-public interface RecipientBoxService extends IService<RecipientBox> {
+public interface LetterService extends IService<Letter> {
 
 }

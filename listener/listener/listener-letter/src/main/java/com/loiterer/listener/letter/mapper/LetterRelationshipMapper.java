@@ -1,6 +1,6 @@
 package com.loiterer.listener.letter.mapper;
 
-import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
+import com.loiterer.listener.letter.model.entity.LetterRelationship;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
  * </p>
  *
  * @author xzj
- * @since 2020-11-05
+ * @since 2020-11-06
  */
 @Repository
 @Mapper
-public interface EnvelopeStyleMapper extends BaseMapper<EnvelopeStyle> {
+public interface LetterRelationshipMapper extends BaseMapper<LetterRelationship> {
 
 }

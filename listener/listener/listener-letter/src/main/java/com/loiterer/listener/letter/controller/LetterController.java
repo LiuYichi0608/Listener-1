@@ -8,15 +8,14 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * <p>
  *  前端控制器
- *  接收信件
  * </p>
  *
  * @author xzj
- * @since 2020-11-05
+ * @since 2020-11-06
  */
 @RestController
-@RequestMapping("/letter/recipient-box")
-public class RecipientBoxController {
+@RequestMapping("/letter/letter")
+public class LetterController {
 
 }
 
