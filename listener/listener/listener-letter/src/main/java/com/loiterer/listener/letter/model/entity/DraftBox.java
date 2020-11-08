@@ -9,61 +9,73 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 对应数据库表t_letter_relationship
- * 信件关系
+ * 
  * </p>
  *
  * @author xzj
- * @since 2020-11-06
+ * @since 2020-11-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("t_letter_relationship")
-public class LetterRelationship implements Serializable {
+@TableName("t_draft_box")
+public class DraftBox implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键
-     */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.INPUT)
     private Integer id;
 
     /**
-     * 写信人的id
+     * 写信人id
      */
     private Integer writerId;
 
     /**
-     * 写信人的昵称
+     * 写信人笔名
      */
     private String writerNickName;
 
     /**
-     * 收件人的id
+     * 收件人id
      */
     private Integer recipientId;
 
     /**
-     * 收信人的昵称
+     * 收件人笔名
      */
     private String recipientNickName;
 
     /**
-     * 信件id
+     * 信件标题
      */
-    private Integer letterId;
+    private String title;
 
     /**
-     * 收信人读信状态, 0代表未读, 1代表以读
+     * 信件内容
      */
-    private Integer isRead;
+    private String content;
 
     /**
-     * 收信人收到信件的时间
+     * 信件创建时间
      */
     @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;
 
+    /**
+     * 信封样式id
+     */
+    private Integer envelopeId;
+
+    /**
+     * 0表示未读，1表示已读
+     * 插入的时候默认设置为0(未读)
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private Integer isRead;
+
+    /**
+     * 0代表不是回信, 1代表是回信
+     */
+    private Integer isReply;
 
 }

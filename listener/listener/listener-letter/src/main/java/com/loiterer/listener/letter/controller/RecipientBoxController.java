@@ -11,13 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
  * </p>
  *
  * @author xzj
- * @since 2020-11-06
+ * @since 2020-11-08
  */
 @RestController
-@RequestMapping("/letter/letter-relationship")
-public class LetterRelationshipController {
-
-
+@RequestMapping("/letter/recipient-box")
+public class RecipientBoxController {
 
 }
 

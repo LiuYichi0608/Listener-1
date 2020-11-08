@@ -44,7 +44,7 @@ public class CodeGenerator {
         // 2、全局配置
         GlobalConfig gc = new GlobalConfig();
 //        String projectPath = System.getProperty("user.dir");
-        String projectPath = "E:/code/java_code/work/20201024/listener/listener/listener-letter";
+        String projectPath = "E:/code/java_code/work/20201108/Listener/listener/listener/listener-letter";
         gc.setOutputDir(projectPath + "/src/main/java");
 
         gc.setAuthor("xzj");
@@ -85,7 +85,9 @@ public class CodeGenerator {
         // 5、策略配置
         StrategyConfig strategy = new StrategyConfig();
         strategy.setInclude(
-                "t_letter"
+                "t_draft_box",
+                "t_recipient_box",
+                "t_writer_box"
         );  // 表名
         strategy.setNaming(NamingStrategy.underline_to_camel);  // 数据库表映射到实体的命名策略
         strategy.setTablePrefix("t" + "_");  // 生成实体时去掉表前缀
