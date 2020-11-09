@@ -49,8 +49,8 @@ spring:
 
 # mybatis config
 mybatis-plus:
-  # 映射mapper.xml文件的路径
-  mapper-locations: classpath*:/mybatis/mapper/*.xml
+  # 映射mapper.xml文件的路径(对于多模块需要使用classpath*来解决)
+  mapper-locations: classpath*:mybatis/mapper/*.xml
   configuration:
     # 开启驼峰命名法
     map-underscore-to-camel-case: true

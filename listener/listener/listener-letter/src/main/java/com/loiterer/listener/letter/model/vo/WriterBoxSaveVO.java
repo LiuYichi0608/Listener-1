@@ -1,7 +1,5 @@
 package com.loiterer.listener.letter.model.vo;
 
-
-
 import lombok.Data;
 
 import java.io.Serializable;
