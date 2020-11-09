@@ -1,11 +1,10 @@
 package com.loiterer.listener.letter.model.vo;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
+
+
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 前端发送保存信件信息时传送的数据

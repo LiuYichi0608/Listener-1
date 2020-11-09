@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/listener/listener.iml" filepath="$PROJECT_DIR$/listener/listener.iml" />
+      <module fileurl="file://$PROJECT_DIR$/listener/listener-common/listener-common.iml" filepath="$PROJECT_DIR$/listener/listener-common/listener-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/listener/listener-letter/listener-letter.iml" filepath="$PROJECT_DIR$/listener/listener-letter/listener-letter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/listener/listener-starter/listener-starter.iml" filepath="$PROJECT_DIR$/listener/listener-starter/listener-starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/listener/listener-user/listener-user.iml" filepath="$PROJECT_DIR$/listener/listener-user/listener-user.iml" />
+    </modules>
+  </component>
+</project>
