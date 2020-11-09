@@ -25,7 +25,7 @@ public class EnvelopeStyle implements Serializable {
     /**
      * 信件样式id
      */
-      @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private Integer id;
 
     /**
