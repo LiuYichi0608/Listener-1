@@ -2,13 +2,14 @@ package com.loiterer.listener.letter.controller;
 
 import com.loiterer.listener.common.result.ResultEntity;
 import com.loiterer.listener.common.util.JwtUtil;
-import com.loiterer.listener.letter.model.vo.WriterBoxSaveVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxVO;
 import com.loiterer.listener.letter.service.WriterBoxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * <p>
@@ -56,7 +57,7 @@ public class WriterBoxController {
      */
     @PostMapping("/add/letter")
     public ResultEntity addLetter(
-            @RequestBody WriterBoxSaveVO writerBoxSaveVO,
+            @RequestBody WriterBoxVO writerBoxSaveVO,
             HttpServletRequest request
             ) {
 
@@ -74,6 +75,30 @@ public class WriterBoxController {
 
         // 保存成功
         return ResultEntity.success();
+    }
+
+    /**
+     * 获取该用户所有自己写的信件
+     * @param request 从request中获取token并获取到用户的openid
+     * @return        返回该用户自己写的所有信件
+     */
+    @GetMapping("/get/all/writer/letters")
+    public ResultEntity getAllWriterLetters(
+            HttpServletRequest request
+    ) {
+
+        // 1.获取用户的openid
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
+
+        // 2.获取用户所有自己写的信件
+        List<WriterBoxVO> writerBoxVOList = writerBoxService.getAllWriterLettersByOpenid(openid);
+
+        // 3.获取失败则返回失败信息, 否则返回成功信息以及信件列表
+        if (writerBoxVOList == null) {
+            return ResultEntity.fail().message("获取信件失败");
+        }
+
+        return ResultEntity.success().data("writerBoxList", writerBoxVOList);
     }
 
 }

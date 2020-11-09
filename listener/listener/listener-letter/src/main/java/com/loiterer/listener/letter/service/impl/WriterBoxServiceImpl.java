@@ -1,11 +1,13 @@
 package com.loiterer.listener.letter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.loiterer.listener.common.exception.ListenerException;
+import com.loiterer.listener.common.result.ResultCodeEnum;
 import com.loiterer.listener.letter.mapper.RecipientBoxMapper;
 import com.loiterer.listener.letter.model.entity.RecipientBox;
 import com.loiterer.listener.letter.model.entity.WriterBox;
 import com.loiterer.listener.letter.mapper.WriterBoxMapper;
-import com.loiterer.listener.letter.model.vo.WriterBoxSaveVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxVO;
 import com.loiterer.listener.letter.service.WriterBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.loiterer.listener.user.mapper.UserMapper;
@@ -15,10 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -69,15 +68,10 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
     }
 
     @Override
-    public boolean writeLetter(WriterBoxSaveVO writerBoxSaveVO, String openid) {
+    public boolean writeLetter(WriterBoxVO writerBoxSaveVO, String openid) {
 
         // 1.获取user的id和nick_name
-        // 1.1 封装条件
-        QueryWrapper<User> writerQueryWrapper = new QueryWrapper<>();
-        writerQueryWrapper.select("id", "nick_name");
-        writerQueryWrapper.eq("openid", openid);
-        // 1.2 根据条件查找信息
-        User writerUser = userMapper.selectOne(writerQueryWrapper);
+        User writerUser = getUserInfo(openid, "id", "nick_name");
 
         // 2.根据逻辑查找到几个要接收信件的用户的信息
         // 2.1 查找所有用户的数量
@@ -116,6 +110,10 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
         // 3.1 封装发送的信件信息
         // 3.1.1 封装信件信息
         WriterBox writerBox = new WriterBox();
+        // 防止传入id导致数据库id随着传入的id而被修改
+        writerBoxSaveVO.setId(null);
+        // 防止传入nickname导致数据库nickname随着传入的nickname而被修改
+        writerBoxSaveVO.setWriterNickName(null);
         BeanUtils.copyProperties(writerBoxSaveVO, writerBox);
         // 3.1.2 封装用户信息
         writerBox.setWriterId(writerUser.getId());
@@ -141,6 +139,52 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
         }
 
         return true;
+    }
+
+    @Override
+    public List<WriterBoxVO> getAllWriterLettersByOpenid(String openid) {
+
+        // 1.获取user的id
+        User writerUser = getUserInfo(openid, "id");
+
+        // 2.通过用户id查找用户所有的信件信息
+        // 2.1 封装查询条件
+        QueryWrapper<WriterBox> writerBoxQueryWrapper = new QueryWrapper<>();
+        writerBoxQueryWrapper.eq("writer_id", writerUser.getId());
+        // 2.2 根据查询条件查询
+        List<WriterBox> originWriterBoxList = writerBoxMapper.selectList(writerBoxQueryWrapper);
+
+        // 3.封装成vo返回
+        List<WriterBoxVO> returnWriterBoxList = new ArrayList<>();
+        for (WriterBox writerBox : originWriterBoxList) {
+            WriterBoxVO writerBoxVO = new WriterBoxVO();
+            BeanUtils.copyProperties(writerBox, writerBoxVO);
+            returnWriterBoxList.add(writerBoxVO);
+        }
+
+        return returnWriterBoxList;
+    }
+
+    /**
+     * 根据columns信息获取user的信息
+     * @param openid  用户的openid
+     * @param columns 要获取的字段的信息
+     * @return        返回用户信息
+     */
+    private User getUserInfo(String openid, String... columns) {
+        // 1.封装条件
+        QueryWrapper<User> writerQueryWrapper = new QueryWrapper<>();
+        writerQueryWrapper.select(columns);
+        writerQueryWrapper.eq("openid", openid);
+
+        // 2.根据条件查找信息
+        User writerUser = userMapper.selectOne(writerQueryWrapper);
+
+        // 3.判断用户信息是否存在, 不存在抛出异常, 否则返回用户信息
+        if (writerUser == null) {
+            throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "获取用户信息失败!");
+        }
+        return writerUser;
     }
 
 }
