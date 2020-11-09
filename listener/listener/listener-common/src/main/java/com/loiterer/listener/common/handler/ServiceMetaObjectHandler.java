@@ -18,6 +18,8 @@ public class ServiceMetaObjectHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         // 当插入信息的时候, 插入当前日期
         this.setFieldValByName("gmtCreate", new Date(), metaObject);
+        // 当插入的时候, 设置信件未读
+        this.setFieldValByName("isRead", 0, metaObject);
     }
 
     @Override

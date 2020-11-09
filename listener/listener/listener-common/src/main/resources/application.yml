@@ -62,7 +62,7 @@ logging:
   level:
     com:
       loiterer:
-        listener: debug
+        listener: info
 
 # 对配置文件中的信息进行加密操作
 # jasypt 密码加密配置
