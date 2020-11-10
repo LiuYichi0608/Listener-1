@@ -1,8 +1,6 @@
 package com.loiterer.listener.letter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.loiterer.listener.common.exception.ListenerException;
-import com.loiterer.listener.common.result.ResultCodeEnum;
 import com.loiterer.listener.letter.mapper.EnvelopeStyleMapper;
 import com.loiterer.listener.letter.mapper.RecipientBoxMapper;
 import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
@@ -13,7 +11,7 @@ import com.loiterer.listener.letter.model.vo.ReplyLetterVO;
 import com.loiterer.listener.letter.model.vo.WriterBoxVO;
 import com.loiterer.listener.letter.service.WriterBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.loiterer.listener.user.mapper.UserMapper;
+import com.loiterer.listener.letter.util.UserUtil;
 import com.loiterer.listener.user.model.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -55,39 +53,39 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
     private final EnvelopeStyleMapper envelopeStyleMapper;
 
     /**
-     * 需要用到userMapper来获取用户信息
+     * 需要用到userUtil来获取用户信息
      */
-    private final UserMapper userMapper;
+    private final UserUtil userUtil;
 
     /**
      * 构造方法, 对象初始化的时候注入
      * @param writerBoxMapper     与收信表对应的mapper
      * @param recipientBoxMapper  与发信表对应的mapper
      * @param envelopeStyleMapper 获取信件样式url的mapper
-     * @param userMapper          userMapper来获取用户信息
+     * @param userUtil            userUtil来获取用户信息
      */
     @Autowired
     public WriterBoxServiceImpl(
             WriterBoxMapper writerBoxMapper,
             RecipientBoxMapper recipientBoxMapper,
             EnvelopeStyleMapper envelopeStyleMapper,
-            UserMapper userMapper
+            UserUtil userUtil
     ) {
         this.writerBoxMapper = writerBoxMapper;
         this.recipientBoxMapper = recipientBoxMapper;
         this.envelopeStyleMapper = envelopeStyleMapper;
-        this.userMapper = userMapper;
+        this.userUtil = userUtil;
     }
 
     @Override
     public boolean writeLetter(WriterBoxVO writerBoxSaveVO, String openid) {
 
         // 1.获取user的id和nick_name
-        User writerUser = getUserInfo(openid, "id", "nick_name");
+        User writerUser = userUtil.getUserInfo(openid, "id", "nick_name");
 
         // 2.根据逻辑查找到几个要接收信件的用户的信息
         // 2.1 查找所有用户的数量
-        int userTotal = userMapper.selectCount(null);
+        int userTotal = userUtil.selectCount(null);
         // 2.2 设置要随机发送的用户的数量为总用户数量减一
         int recipientUserTotal = userTotal - 1;
         // 2.3 设置最多接收用户, 超过这个数则等于最多接受用户数
@@ -116,7 +114,7 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
         }
 
         // 2.6 查找出这些要接受信件的用户的信息
-        List<User> recipientUsers = userMapper.selectBatchIds(recipientUserSet);
+        List<User> recipientUsers = userUtil.selectBatchIds(recipientUserSet);
 
         // 3.组装要保存的信件
         // 3.1 封装发送的信件信息
@@ -157,7 +155,7 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
     public List<WriterBoxVO> getAllWriterLettersByOpenid(String openid) {
 
         // 1.获取user的id
-        User writerUser = getUserInfo(openid, "id");
+        User writerUser = userUtil.getUserInfo(openid, "id");
 
         // 2.通过用户id查找用户所有的信件信息
         // 2.1 封装查询条件
@@ -189,7 +187,7 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
     public boolean deleteLetterById(Integer id, String openid) {
 
         // 1.获取user的id
-        User writerUser = getUserInfo(openid, "id");
+        User writerUser = userUtil.getUserInfo(openid, "id");
 
         // 2.通过用户的id和信件id删除信件
         // 2.1 封装删除条件
@@ -207,7 +205,7 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
     public boolean saveReplyLetter(ReplyLetterVO replyLetterVO, String openid) {
 
         // 1.获取user的id和nickname
-        User writerUser = getUserInfo(openid, "id", "nick_name");
+        User writerUser = userUtil.getUserInfo(openid, "id", "nick_name");
 
         // 2.封装要保存的信件
         WriterBox writerBox = new WriterBox();
@@ -228,29 +226,6 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
 
         // 4.写与收保存成功才返回
         return insertWriter != 0 && insertRecipient != 0;
-    }
-
-    /**
-     * 根据columns信息获取user的信息
-     * @param openid  用户的openid
-     * @param columns 要获取的字段的信息
-     * @return        返回用户信息
-     */
-    private User getUserInfo(String openid, String... columns) {
-        // 1.封装条件
-        QueryWrapper<User> writerQueryWrapper = new QueryWrapper<>();
-        writerQueryWrapper.select(columns);
-        log.debug("用户的openid为: {}", openid);
-        writerQueryWrapper.eq("openid", openid);
-
-        // 2.根据条件查找信息
-        User writerUser = userMapper.selectOne(writerQueryWrapper);
-
-        // 3.判断用户信息是否存在, 不存在抛出异常, 否则返回用户信息
-        if (writerUser == null) {
-            throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "获取用户信息失败!");
-        }
-        return writerUser;
     }
 
 }

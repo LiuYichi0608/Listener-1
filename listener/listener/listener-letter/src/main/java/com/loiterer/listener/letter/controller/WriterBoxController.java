@@ -75,7 +75,7 @@ public class WriterBoxController {
         }
 
         // 保存成功
-        return ResultEntity.success();
+        return ResultEntity.success().message("保存信件成功!");
     }
 
     /**

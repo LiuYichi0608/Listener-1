@@ -24,7 +24,8 @@ public class ServiceMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        // 更新的时候暂时没什么要做的
+        // 更新的时候修改为当前时间
+        this.setFieldValByName("gmtModified", new Date(), metaObject);
     }
 
 }

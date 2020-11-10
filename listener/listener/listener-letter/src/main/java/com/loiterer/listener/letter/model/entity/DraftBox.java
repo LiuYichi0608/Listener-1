@@ -22,7 +22,7 @@ public class DraftBox implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -60,6 +60,12 @@ public class DraftBox implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;
+
+    /**
+     * 信件最近一次修改的时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date getModified;
 
     /**
      * 信封样式id
