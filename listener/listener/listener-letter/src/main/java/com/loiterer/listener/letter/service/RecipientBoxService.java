@@ -21,7 +21,7 @@ public interface RecipientBoxService extends IService<RecipientBox> {
      * @param openid 用户的openid
      * @return List<RecipientBoxVO>收信箱信件集合
      */
-    List<RecipientBoxVO> getALlRecipientLettersByOpenid(String openid);
+    List<RecipientBoxVO> getAllRecipientLettersByOpenid(String openid);
 
     /**
      * 根据用户的openid和信件id去删除用户收件箱中的指定信件

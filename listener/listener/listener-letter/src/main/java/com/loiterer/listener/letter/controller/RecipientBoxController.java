@@ -56,7 +56,7 @@ public class RecipientBoxController {
         String openid = jwtUtil.getOpenid(request.getHeader("token"));
 
         // 2.获取用户所有自己收到的未删除的信件
-        List<RecipientBoxVO> recipientBoxVOList = recipientBoxService.getALlRecipientLettersByOpenid(openid);
+        List<RecipientBoxVO> recipientBoxVOList = recipientBoxService.getAllRecipientLettersByOpenid(openid);
 
         // 3.判断获取信件结果
         if(recipientBoxVOList == null) {
