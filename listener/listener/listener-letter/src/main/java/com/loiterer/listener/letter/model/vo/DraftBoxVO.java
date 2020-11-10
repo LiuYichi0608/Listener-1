@@ -6,18 +6,18 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 前端发送保存信件信息时传送的数据
- * 后端返回前端时需要携带的信息
+ * 前端传来需要保存到后端的信息用此vo类保存起来
+ * 后端需要传到前端的草稿信息用此vo类返回
  * @author XieZhiJie
- * @date 2020/11/08 23:47
+ * @date 2020/11/10 14:42
  */
 @Data
-public class WriterBoxVO implements Serializable {
+public class DraftBoxVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 信件id
+     * 草稿id
      */
     private Integer id;
 
@@ -27,17 +27,17 @@ public class WriterBoxVO implements Serializable {
     private String writerNickName;
 
     /**
-     * 信件标题
+     * 草稿标题
      */
     private String title;
 
     /**
-     * 信件内容
+     * 草稿内容
      */
     private String content;
 
     /**
-     * 信封样式id
+     * 草稿样式id
      */
     private Integer envelopeId;
 
@@ -52,13 +52,18 @@ public class WriterBoxVO implements Serializable {
     private String urlPaper;
 
     /**
-     * 是否是回信, 不是回信为0, 否则为1
+     * 是否是回信的草稿, 不是回信的草稿为0, 否则为1
      */
     private Integer isReply;
 
     /**
-     * 写信保存的时间
+     * 草稿保存的时间
      */
     private Date gmtCreate;
+
+    /**
+     * 草稿最进一次修改的时间
+     */
+    private Date gmtModified;
 
 }

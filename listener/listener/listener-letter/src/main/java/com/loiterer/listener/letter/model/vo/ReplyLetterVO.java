@@ -6,25 +6,24 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 前端发送保存信件信息时传送的数据
- * 后端返回前端时需要携带的信息
+ * 回信需要用到的vo类, 前端保存信息需要用到
  * @author XieZhiJie
- * @date 2020/11/08 23:47
+ * @date 2020/11/10 12:04
  */
 @Data
-public class WriterBoxVO implements Serializable {
+public class ReplyLetterVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 信件id
+     * 收信人id
      */
-    private Integer id;
+    private Integer recipientId;
 
     /**
-     * 写信人笔名
+     * 收信人笔名
      */
-    private String writerNickName;
+    private String recipientNickName;
 
     /**
      * 信件标题
@@ -40,16 +39,6 @@ public class WriterBoxVO implements Serializable {
      * 信封样式id
      */
     private Integer envelopeId;
-
-    /**
-     * 信封样式url
-     */
-    private String urlEnvelope;
-
-    /**
-     * 信纸样式url
-     */
-    private String urlPaper;
 
     /**
      * 是否是回信, 不是回信为0, 否则为1
