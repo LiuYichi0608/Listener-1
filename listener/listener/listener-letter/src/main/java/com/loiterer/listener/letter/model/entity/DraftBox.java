@@ -65,7 +65,7 @@ public class DraftBox implements Serializable {
      * 信件最近一次修改的时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date getModified;
+    private Date gmtModified;
 
     /**
      * 信封样式id
