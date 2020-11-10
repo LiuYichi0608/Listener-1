@@ -2,6 +2,7 @@ package com.loiterer.listener.letter.controller;
 
 import com.loiterer.listener.common.result.ResultEntity;
 import com.loiterer.listener.common.util.JwtUtil;
+import com.loiterer.listener.letter.model.vo.ReplyLetterVO;
 import com.loiterer.listener.letter.model.vo.WriterBoxVO;
 import com.loiterer.listener.letter.service.WriterBoxService;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class WriterBoxController {
     public ResultEntity addLetter(
             @RequestBody WriterBoxVO writerBoxSaveVO,
             HttpServletRequest request
-            ) {
+    ) {
 
         // 1.从request中获取到用户的token并使用jwt工具类获取到用户的openid
         String openid = jwtUtil.getOpenid(request.getHeader("token"));
@@ -99,6 +100,56 @@ public class WriterBoxController {
         }
 
         return ResultEntity.success().data("writerBoxList", writerBoxVOList);
+    }
+
+    /**
+     * 根据信件id和信件信息删除信件
+     * @param id      信件id
+     * @param request 从request中获取token并获取到用户的openid
+     * @return        返回是否删除成功的信息
+     */
+    @DeleteMapping("/delete/letter/{id}")
+    public ResultEntity deleteLetter(
+            @PathVariable("id") Integer id,
+            HttpServletRequest request
+    ) {
+
+        // 1.获取用户的openid
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
+
+        // 2.根据信件id和用户openid删除属于这个用户的信件
+        boolean flag = writerBoxService.deleteLetterById(id, openid);
+
+        // 3.判断删除是否成功
+        if (!flag) {
+            return ResultEntity.fail().message("删除失败!");
+        }
+        return ResultEntity.success().message("删除成功!");
+    }
+
+    /**
+     * 保存回信信息
+     * @param replyLetterVO 要保存的回信信息
+     * @param request       从request中获取token并获取到用户的openid
+     * @return              返回是否保存成功
+     */
+    @PostMapping("/add/reply/letter")
+    public ResultEntity addReplyLetter(
+            @RequestBody ReplyLetterVO replyLetterVO,
+            HttpServletRequest request
+    ) {
+
+        // 1.获取用户的openid
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
+
+        // 2.使用service类来保存该信件
+        boolean flag = writerBoxService.saveReplyLetter(replyLetterVO, openid);
+
+        // 3.判断是否保存该信件成功
+        if (!flag) {
+            return ResultEntity.fail().message("保存回信失败!");
+        }
+        return ResultEntity.success().message("保存回信成功!");
     }
 
 }
