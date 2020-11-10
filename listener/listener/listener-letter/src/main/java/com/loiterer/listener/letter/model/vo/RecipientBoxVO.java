@@ -20,15 +20,26 @@ public class RecipientBoxVO implements Serializable {
      */
     private Integer id;
 
+
+    /**
+     * 写信人id
+     */
+    private Integer writerId;
+
     /**
      * 写信人笔名
      */
-    private String writerNickname;
+    private String writerNickName;
+
+    /**
+     * 收信人id
+     */
+    private  Integer recipientId;
 
     /**
      * 收信人笔名
      */
-    private String recipientNickname;
+    private String recipientNickName;
 
     /**
      * 信件标题
