@@ -38,4 +38,11 @@ public interface RecipientBoxService extends IService<RecipientBox> {
      * @return 判断是否删除成功
      */
     boolean updateRecipientLetter(Integer id, String openid);
+
+    /**
+     * 根据用户的openid去获取当前用户收件箱里的10条最新的未删除信件
+     * @param openid 用户的openid
+     * @return List<RecipientBoxVO>收信箱信件集合
+     */
+    List<RecipientBoxVO> getPageRecipientLettersByOpenid(String openid);
 }

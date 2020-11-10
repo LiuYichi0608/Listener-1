@@ -17,7 +17,7 @@ import java.util.List;
  *  前端控制器
  * </p>
  *
- * @author xzj
+ * @author lyc
  * @since 2020-11-08
  */
 @RestController
@@ -67,6 +67,29 @@ public class RecipientBoxController {
             return ResultEntity.success().data("recipientBoxList",recipientBoxVOList);
         }
     }
+    /**
+     * 获取该用户最新10条自己收信的信件
+     * @param request 从request中获取openid
+     * @return 返回该用户收到的最新10条信件
+     */
+    @GetMapping("/getPageLetters")
+    public ResultEntity getPageRecipientLetters(HttpServletRequest request) {
+        // 1.使用jwtUtil从请求头获取openid
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
+
+        // 2.获取用户最新收到的十条信件
+        List<RecipientBoxVO> recipientBoxVOList = recipientBoxService.getPageRecipientLettersByOpenid(openid);
+
+        // 3.判断获取信件结果
+        if(recipientBoxVOList == null) {
+            // 3.1 获取信息失败, 返回失败信息
+            return ResultEntity.fail().message("获取信息失败");
+        } else {
+            // 3.2 获取信件成功, 返回信件信息
+            return ResultEntity.success().data("recipientBoxList",recipientBoxVOList);
+        }
+    }
+
 
     @DeleteMapping("/deleteLetter/{id}")
     public ResultEntity deleteRecipientLetter(@PathVariable("id") Integer id, HttpServletRequest request) {
@@ -102,5 +125,7 @@ public class RecipientBoxController {
             return ResultEntity.success().message("更新未读信件成功");
         }
     }
+
+
 }
 
