@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loiterer.listener.user.mapper.UserMapper">
+    <resultMap id="UserInfoMap" type="com.loiterer.listener.user.model.dto.UserInfoDTO">
+        <id property="id" column="id"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="avatarUrl" column="avatar_url"/>
+        <result property="gender" column="gender"/>
+        <result property="country" column="country"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+    </resultMap>
+
+    <!-- 插入openid -->
+    <insert id="insertOpenid">
+        INSERT INTO t_user SET openid = #{openid}
+    </insert>
+
+    <!-- 判断 openid 是否存在 -->
+    <select id="isOpenidExists" resultType="String">
+        SELECT openid FROM t_user WHERE openid = #{openid}
+    </select>
+
+    <!-- 插入用户数据 -->
+    <update id="insertUserInfo" useGeneratedKeys="true" keyProperty="userInfo.id">
+        UPDATE t_user
+        <set>
+          nick_name = #{userInfo.nickName},
+          avatar_url = #{userInfo.avatarUrl},
+          gender = #{userInfo.gender},
+          country = #{userInfo.country},
+          province = #{userInfo.province},
+          city = #{userInfo.city}
+        </set>
+        WHERE openid = #{openid}
+    </update>
+
+    <!-- 修改用户昵称 -->
+    <update id="updateNickName">
+        UPDATE t_user SET nick_name = #{nickName} WHERE openid = #{openid}
+    </update>
+
+    <!-- 查询用户信息 -->
+    <select id="selectUserInfo" resultMap="UserInfoMap">
+        SELECT
+          id,
+          nick_name,
+          avatar_url,
+          gender,
+          country,
+          province,
+          city
+        FROM t_user
+        WHERE openid = #{openid}
+    </select>
+</mapper>
