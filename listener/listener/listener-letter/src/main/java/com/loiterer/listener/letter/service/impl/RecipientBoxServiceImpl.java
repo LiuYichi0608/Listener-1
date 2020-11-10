@@ -1,8 +1,6 @@
 package com.loiterer.listener.letter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.loiterer.listener.common.exception.ListenerException;
-import com.loiterer.listener.common.result.ResultCodeEnum;
 import com.loiterer.listener.letter.mapper.EnvelopeStyleMapper;
 import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
 import com.loiterer.listener.letter.model.entity.RecipientBox;
@@ -10,10 +8,11 @@ import com.loiterer.listener.letter.mapper.RecipientBoxMapper;
 import com.loiterer.listener.letter.model.vo.RecipientBoxVO;
 import com.loiterer.listener.letter.service.RecipientBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.loiterer.listener.user.mapper.UserMapper;
+import com.loiterer.listener.letter.util.UserUtil;
 import com.loiterer.listener.user.model.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,11 +31,6 @@ import java.util.List;
 public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, RecipientBox> implements RecipientBoxService {
 
     /**
-     * 与用户表对应的mapper
-     */
-    private final UserMapper userMapper;
-
-    /**
      * 与用户收信表对应的mapper
      */
     private final RecipientBoxMapper recipientBoxMapper;
@@ -47,22 +41,28 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
     private final EnvelopeStyleMapper envelopeStyleMapper;
 
     /**
+     * userUtil来获取用户信息
+     */
+    private final UserUtil userUtil;
+
+    /**
      * 构造方法, 主要用于实现对象初始化注入
-     * @param userMapper 与用户表对应的mapper
      * @param recipientBoxMapper 与用户收信表对应的mapper
      * @param envelopeStyleMapper 与信件样式表对应的mapper
+     * @param userUtil userUtil来获取用户信息
      */
-    public RecipientBoxServiceImpl(UserMapper userMapper, RecipientBoxMapper recipientBoxMapper, EnvelopeStyleMapper envelopeStyleMapper) {
-        this.userMapper = userMapper;
+    @Autowired
+    public RecipientBoxServiceImpl(RecipientBoxMapper recipientBoxMapper, EnvelopeStyleMapper envelopeStyleMapper, UserUtil userUtil) {
         this.recipientBoxMapper = recipientBoxMapper;
         this.envelopeStyleMapper = envelopeStyleMapper;
+        this.userUtil = userUtil;
     }
 
     @Override
-    public List<RecipientBoxVO> getALlRecipientLettersByOpenid(String openid) {
+    public List<RecipientBoxVO> getAllRecipientLettersByOpenid(String openid) {
 
         // 1.获取当前用户的id和昵称
-        User recipientUser = getUserInfo(openid, "id", "nick_name");
+        User recipientUser = userUtil.getUserInfo(openid, "id", "nick_name");
 
         // 2.通过用户id查找用户所有的信件信息
         // 2.1 封装查询条件
@@ -96,7 +96,7 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
     @Override
     public boolean deleteRecipientLetter(Integer id, String openid) {
         // 1.获取当前用户的id和昵称
-        User recipientUser = getUserInfo(openid, "id", "nick_name");
+        User recipientUser = userUtil.getUserInfo(openid, "id", "nick_name");
 
         // 2.通过用户id和信件id删除收件箱信件
         // 2.1 封装查询条件
@@ -112,7 +112,7 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
     @Override
     public boolean updateRecipientLetter(Integer id, String openid) {
         // 1.获取当前用户的id和昵称
-        User recipientUser = getUserInfo(openid, "id", "nick_name");
+        User recipientUser = userUtil.getUserInfo(openid, "id", "nick_name");
 
         // 2.通过用户id和信件id删除收件箱信件
         // 2.1 封装查询条件
@@ -139,25 +139,25 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
     }
 
 
-    /**
-     * 根据columns信息获取user的信息
-     * @param openid  用户的openid
-     * @param columns 要获取的字段的信息
-     * @return        返回用户信息
-     */
-    private User getUserInfo(String openid, String... columns) {
-        // 1.封装条件
-        QueryWrapper<User> RecipientQueryWrapper = new QueryWrapper<>();
-        RecipientQueryWrapper.select(columns);
-        RecipientQueryWrapper.eq("openid", openid);
-
-        // 2.根据条件查找信息
-        User RecipientUser = userMapper.selectOne(RecipientQueryWrapper);
-
-        // 3.判断用户信息是否存在, 不存在抛出异常, 否则返回用户信息
-        if (RecipientUser == null) {
-            throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "获取用户信息失败!");
-        }
-        return RecipientUser;
-    }
+//    /**
+//     * 根据columns信息获取user的信息
+//     * @param openid  用户的openid
+//     * @param columns 要获取的字段的信息
+//     * @return        返回用户信息
+//     */
+//    private User getUserInfo(String openid, String... columns) {
+//        // 1.封装条件
+//        QueryWrapper<User> RecipientQueryWrapper = new QueryWrapper<>();
+//        RecipientQueryWrapper.select(columns);
+//        RecipientQueryWrapper.eq("openid", openid);
+//
+//        // 2.根据条件查找信息
+//        User RecipientUser = userMapper.selectOne(RecipientQueryWrapper);
+//
+//        // 3.判断用户信息是否存在, 不存在抛出异常, 否则返回用户信息
+//        if (RecipientUser == null) {
+//            throw new ListenerException(ResultCodeEnum.FAIL.getCode(), "获取用户信息失败!");
+//        }
+//        return RecipientUser;
+//    }
 }
