@@ -3,10 +3,13 @@ package com.loiterer.listener.letter.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.loiterer.listener.common.exception.ListenerException;
 import com.loiterer.listener.common.result.ResultCodeEnum;
+import com.loiterer.listener.letter.mapper.EnvelopeStyleMapper;
 import com.loiterer.listener.letter.mapper.RecipientBoxMapper;
+import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
 import com.loiterer.listener.letter.model.entity.RecipientBox;
 import com.loiterer.listener.letter.model.entity.WriterBox;
 import com.loiterer.listener.letter.mapper.WriterBoxMapper;
+import com.loiterer.listener.letter.model.vo.ReplyLetterVO;
 import com.loiterer.listener.letter.model.vo.WriterBoxVO;
 import com.loiterer.listener.letter.service.WriterBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,23 +50,32 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
     private final RecipientBoxMapper recipientBoxMapper;
 
     /**
+     * 获取信件样式url的mapper
+     */
+    private final EnvelopeStyleMapper envelopeStyleMapper;
+
+    /**
      * 需要用到userMapper来获取用户信息
      */
     private final UserMapper userMapper;
 
     /**
      * 构造方法, 对象初始化的时候注入
-     * @param writerBoxMapper    与收信表对应的mapper
-     * @param recipientBoxMapper 与发信表对应的mapper
+     * @param writerBoxMapper     与收信表对应的mapper
+     * @param recipientBoxMapper  与发信表对应的mapper
+     * @param envelopeStyleMapper 获取信件样式url的mapper
+     * @param userMapper          userMapper来获取用户信息
      */
     @Autowired
     public WriterBoxServiceImpl(
             WriterBoxMapper writerBoxMapper,
             RecipientBoxMapper recipientBoxMapper,
+            EnvelopeStyleMapper envelopeStyleMapper,
             UserMapper userMapper
     ) {
         this.writerBoxMapper = writerBoxMapper;
         this.recipientBoxMapper = recipientBoxMapper;
+        this.envelopeStyleMapper = envelopeStyleMapper;
         this.userMapper = userMapper;
     }
 
@@ -125,7 +137,7 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
 
         // 3.2 封装接收的信件信息
         for (User recipientUser : recipientUsers) {
-            // 3.1.1 封装新建信息
+            // 3.1.1 封装信件信息
             RecipientBox recipientBox = new RecipientBox();
             BeanUtils.copyProperties(writerBoxSaveVO, recipientBox);
             // 3.1.2 封装用户信息
@@ -155,14 +167,67 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
         List<WriterBox> originWriterBoxList = writerBoxMapper.selectList(writerBoxQueryWrapper);
 
         // 3.封装成vo返回
+        // 3.1 创建需要返回的信件信息的列表
         List<WriterBoxVO> returnWriterBoxList = new ArrayList<>();
         for (WriterBox writerBox : originWriterBoxList) {
+            // 3.2 设置样式查询条件
+            QueryWrapper<EnvelopeStyle> envelopeStyleQueryWrapper = new QueryWrapper<>();
+            // 3.3 查询信件的样式url
+            envelopeStyleQueryWrapper.eq("id", writerBox.getEnvelopeId());
+            EnvelopeStyle envelopeStyle = envelopeStyleMapper.selectOne(envelopeStyleQueryWrapper);
+            // 3.4 封装vo对象
             WriterBoxVO writerBoxVO = new WriterBoxVO();
+            BeanUtils.copyProperties(envelopeStyle, writerBoxVO);
             BeanUtils.copyProperties(writerBox, writerBoxVO);
             returnWriterBoxList.add(writerBoxVO);
         }
 
         return returnWriterBoxList;
+    }
+
+    @Override
+    public boolean deleteLetterById(Integer id, String openid) {
+
+        // 1.获取user的id
+        User writerUser = getUserInfo(openid, "id");
+
+        // 2.通过用户的id和信件id删除信件
+        // 2.1 封装删除条件
+        QueryWrapper<WriterBox> writerBoxQueryWrapper = new QueryWrapper<>();
+        writerBoxQueryWrapper.eq("id", id);
+        writerBoxQueryWrapper.eq("writer_id", writerUser.getId());
+        // 2.2 根据删除条件删除
+        int delete = writerBoxMapper.delete(writerBoxQueryWrapper);
+
+        // 3.判断是否删除成功
+        return delete > 0;
+    }
+
+    @Override
+    public boolean saveReplyLetter(ReplyLetterVO replyLetterVO, String openid) {
+
+        // 1.获取user的id和nickname
+        User writerUser = getUserInfo(openid, "id", "nick_name");
+
+        // 2.封装要保存的信件
+        WriterBox writerBox = new WriterBox();
+        // 2.1 放入写信人信息
+        writerBox.setWriterId(writerUser.getId());
+        writerBox.setWriterNickName(writerUser.getNickName());
+        // 2.2 放入信件信息和收信人信息
+        BeanUtils.copyProperties(replyLetterVO, writerBox);
+        // 2.3 设置为回信
+        writerBox.setIsReply(1);
+        // 2.4 设置接收信件的信息
+        RecipientBox recipientBox = new RecipientBox();
+        BeanUtils.copyProperties(writerBox, recipientBox);
+
+        // 3.保存写信的信息, 与保存收信的信息
+        int insertWriter = writerBoxMapper.insert(writerBox);
+        int insertRecipient = recipientBoxMapper.insert(recipientBox);
+
+        // 4.写与收保存成功才返回
+        return insertWriter != 0 && insertRecipient != 0;
     }
 
     /**
@@ -175,6 +240,7 @@ public class WriterBoxServiceImpl extends ServiceImpl<WriterBoxMapper, WriterBox
         // 1.封装条件
         QueryWrapper<User> writerQueryWrapper = new QueryWrapper<>();
         writerQueryWrapper.select(columns);
+        log.debug("用户的openid为: {}", openid);
         writerQueryWrapper.eq("openid", openid);
 
         // 2.根据条件查找信息
