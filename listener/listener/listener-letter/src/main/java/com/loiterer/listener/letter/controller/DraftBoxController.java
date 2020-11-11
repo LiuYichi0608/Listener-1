@@ -3,7 +3,9 @@ package com.loiterer.listener.letter.controller;
 
 import com.loiterer.listener.common.result.ResultEntity;
 import com.loiterer.listener.common.util.JwtUtil;
-import com.loiterer.listener.letter.model.vo.DraftBoxVO;
+import com.loiterer.listener.letter.model.vo.DraftBoxContentVO;
+import com.loiterer.listener.letter.model.vo.DraftBoxEnvelopeVO;
+import com.loiterer.listener.letter.model.vo.DraftBoxSaveVO;
 import com.loiterer.listener.letter.model.vo.ReplyDraftVO;
 import com.loiterer.listener.letter.service.DraftBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +52,13 @@ public class DraftBoxController {
 
     /**
      * 插入草稿信息
-     * @param draftBoxVO 要保存的信件信息
-     * @param request    从request中获取token并获取到用户的openid
-     * @return           返回保存草稿是否成功的信息
+     * @param draftBoxSaveVO 要保存的草稿信息
+     * @param request        从request中获取token并获取到用户的openid
+     * @return               返回保存草稿是否成功的信息
      */
     @PostMapping("/add/draft")
     public ResultEntity addDraft(
-            @RequestBody DraftBoxVO draftBoxVO,
+            @RequestBody DraftBoxSaveVO draftBoxSaveVO,
             HttpServletRequest request
     ) {
 
@@ -64,7 +66,7 @@ public class DraftBoxController {
         String openid = jwtUtil.getOpenid(request.getHeader("token"));
 
         // 2.使用service类来保存草稿
-        boolean flag = draftBoxService.addDraft(draftBoxVO, openid);
+        boolean flag = draftBoxService.addDraft(draftBoxSaveVO, openid);
 
         // 3.判断是否保存草稿成功
         if (!flag) {
@@ -87,7 +89,7 @@ public class DraftBoxController {
         String openid = jwtUtil.getOpenid(request.getHeader("token"));
 
         // 2.获取用户所有草稿
-        List<DraftBoxVO> draftBoxVOList = draftBoxService.getAllDrafts(openid);
+        List<DraftBoxEnvelopeVO> draftBoxVOList = draftBoxService.getAllDrafts(openid);
 
         // 3.获取失败则返回失败信息, 否则返回成功信息以及信件列表
         if (draftBoxVOList == null) {
@@ -98,13 +100,13 @@ public class DraftBoxController {
 
     /**
      * 更新草稿信息
-     * @param draftBoxVO 要更新的草稿信息
-     * @param request    从request中获取token并获取到用户的openid
-     * @return           返回是否更新成功
+     * @param draftBoxSaveVO 要更新的草稿信息
+     * @param request        从request中获取token并获取到用户的openid
+     * @return               返回是否更新成功
      */
     @PutMapping("/update/draft")
     public ResultEntity updateDraft(
-            @RequestBody DraftBoxVO draftBoxVO,
+            @RequestBody DraftBoxSaveVO draftBoxSaveVO,
             HttpServletRequest request
     ) {
 
@@ -112,7 +114,7 @@ public class DraftBoxController {
         String openid = jwtUtil.getOpenid(request.getHeader("token"));
 
         // 2.更新草稿信息
-        boolean flag = draftBoxService.updateDraft(draftBoxVO, openid);
+        boolean flag = draftBoxService.updateDraft(draftBoxSaveVO, openid);
 
         // 3.判断是否更新该草稿成功
         if (!flag) {
@@ -169,7 +171,32 @@ public class DraftBoxController {
             return ResultEntity.fail().message("保存草稿失败!");
         }
         return ResultEntity.success().message("保存草稿成功!");
+    }
 
+    /**
+     * 根据用户信息和信件id获取一封草稿的内容
+     * @param id      草稿id
+     * @param request 从request中获取token并获取到用户的openid
+     * @return        返回一封草稿的具体内容
+     */
+    @GetMapping("/get/draft/{id}")
+    public ResultEntity getDraftByDraftId(
+            @PathVariable("id") Integer id,
+            HttpServletRequest request
+    ) {
+
+        // 1.获取用户的openid
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
+
+        // 2.使用service获取一封草稿的内容
+        DraftBoxContentVO draftBoxContentVO = draftBoxService.getDraftByDraftId(id, openid);
+
+        // 3.获取失败返回失败信息, 否则返回信件内容与成功信息
+        if (draftBoxContentVO == null) {
+            return ResultEntity.fail().message("获取草稿信息失败!");
+        }
+
+        return ResultEntity.success().data("draftBoxContent", draftBoxContentVO);
     }
 
 }

@@ -3,7 +3,9 @@ package com.loiterer.listener.letter.controller;
 import com.loiterer.listener.common.result.ResultEntity;
 import com.loiterer.listener.common.util.JwtUtil;
 import com.loiterer.listener.letter.model.vo.ReplyLetterVO;
-import com.loiterer.listener.letter.model.vo.WriterBoxVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxContentVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxEnvelopeVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxSaveVO;
 import com.loiterer.listener.letter.service.WriterBoxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +60,7 @@ public class WriterBoxController {
      */
     @PostMapping("/add/letter")
     public ResultEntity addLetter(
-            @RequestBody WriterBoxVO writerBoxSaveVO,
+            @RequestBody WriterBoxSaveVO writerBoxSaveVO,
             HttpServletRequest request
     ) {
 
@@ -92,7 +94,7 @@ public class WriterBoxController {
         String openid = jwtUtil.getOpenid(request.getHeader("token"));
 
         // 2.获取用户所有自己写的信件
-        List<WriterBoxVO> writerBoxVOList = writerBoxService.getAllWriterLettersByOpenid(openid);
+        List<WriterBoxEnvelopeVO> writerBoxVOList = writerBoxService.getAllWriterLettersByOpenid(openid);
 
         // 3.获取失败则返回失败信息, 否则返回成功信息以及信件列表
         if (writerBoxVOList == null) {
@@ -150,6 +152,32 @@ public class WriterBoxController {
             return ResultEntity.fail().message("保存回信失败!");
         }
         return ResultEntity.success().message("保存回信成功!");
+    }
+
+    /**
+     * 根据用户信息和信件id获取一封信的内容
+     * @param id      信件id
+     * @param request 从request中获取token并获取到用户的openid
+     * @return        返回一封信的具体内容
+     */
+    @GetMapping("/get/letter/{id}")
+    public ResultEntity getLetterByLetterId(
+            @PathVariable("id") Integer id,
+            HttpServletRequest request
+    ) {
+
+        // 1.获取用户的openid
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
+
+        // 2.使用service获取一封信的内容
+        WriterBoxContentVO writerBoxContentVO = writerBoxService.getLetterByLetterId(id, openid);
+
+        // 3.获取失败返回失败信息, 否则返回信件内容与成功信息
+        if (writerBoxContentVO == null) {
+            return ResultEntity.fail().message("获取信件内容失败!");
+        }
+
+        return ResultEntity.success().data("writerBoxContent", writerBoxContentVO);
     }
 
 }

@@ -3,27 +3,16 @@ package com.loiterer.listener.letter.model.vo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
- * 回信需要用到的vo类, 前端保存信息需要用到
+ * 写信需要保存的信息
  * @author XieZhiJie
- * @date 2020/11/10 12:04
+ * @date 2020/11/11 20:07
  */
 @Data
-public class ReplyLetterVO implements Serializable {
+public class WriterBoxSaveVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 收信人id
-     */
-    private Integer recipientId;
-
-    /**
-     * 收信人笔名
-     */
-    private String recipientNickName;
 
     /**
      * 信件标题

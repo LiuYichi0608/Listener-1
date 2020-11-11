@@ -5,7 +5,9 @@ import com.loiterer.listener.letter.mapper.EnvelopeStyleMapper;
 import com.loiterer.listener.letter.model.entity.DraftBox;
 import com.loiterer.listener.letter.mapper.DraftBoxMapper;
 import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
-import com.loiterer.listener.letter.model.vo.DraftBoxVO;
+import com.loiterer.listener.letter.model.vo.DraftBoxContentVO;
+import com.loiterer.listener.letter.model.vo.DraftBoxEnvelopeVO;
+import com.loiterer.listener.letter.model.vo.DraftBoxSaveVO;
 import com.loiterer.listener.letter.model.vo.ReplyDraftVO;
 import com.loiterer.listener.letter.service.DraftBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -58,17 +60,17 @@ public class DraftBoxServiceImpl extends ServiceImpl<DraftBoxMapper, DraftBox> i
     }
 
     @Override
-    public boolean addDraft(DraftBoxVO draftBoxVO, String openid) {
+    public boolean addDraft(DraftBoxSaveVO draftBoxSaveVO, String openid) {
 
         // 1.获取user的id和nick_name
         User writerUser = userUtil.getUserInfo(openid, "id", "nick_name");
 
         // 2.组装要存到数据库的草稿数据
-        // 2.1 先保证不会存入不需要的数据
-        draftBoxVO.setIsReply(0);
-        // 2.2 将用户信息和草稿信息组装起来
+        // 将用户信息和草稿信息组装起来
         DraftBox draftBox = new DraftBox();
-        BeanUtils.copyProperties(draftBoxVO, draftBox);
+        // 设置非回草稿
+        draftBox.setIsReply(0);
+        BeanUtils.copyProperties(draftBoxSaveVO, draftBox);
         draftBox.setWriterId(writerUser.getId());
         draftBox.setWriterNickName(writerUser.getNickName());
 
@@ -79,7 +81,7 @@ public class DraftBoxServiceImpl extends ServiceImpl<DraftBoxMapper, DraftBox> i
     }
 
     @Override
-    public List<DraftBoxVO> getAllDrafts(String openid) {
+    public List<DraftBoxEnvelopeVO> getAllDrafts(String openid) {
 
         // 1.获取user的id
         User writerUser = userUtil.getUserInfo(openid, "id");
@@ -88,44 +90,58 @@ public class DraftBoxServiceImpl extends ServiceImpl<DraftBoxMapper, DraftBox> i
         // 2.1 封装查询条件
         QueryWrapper<DraftBox> draftBoxQueryWrapper = new QueryWrapper<>();
         draftBoxQueryWrapper.eq("writer_id", writerUser.getId());
-        // 2.2 根据查询条件查询
+        // 2.2封装要查询的字段
+        draftBoxQueryWrapper.select(
+                "id",
+                "writer_id",
+                "writer_nick_name",
+                "recipient_id",
+                "recipient_nick_name",
+                "title",
+                "gmt_create",
+                "gmt_modified",
+                "envelope_id",
+                "is_reply"
+        );
+        // 2.3 根据查询条件查询
         List<DraftBox> originDraftBoxList = draftBoxMapper.selectList(draftBoxQueryWrapper);
 
         // 3.封装成vo返回
         // 3.1 创建需要返回的草稿信息的列表
-        List<DraftBoxVO> returnDraftBoxList = new ArrayList<>();
+        List<DraftBoxEnvelopeVO> returnDraftBoxList = new ArrayList<>();
         for (DraftBox draftBox : originDraftBoxList) {
             // 3.2 设置样式查询条件
             QueryWrapper<EnvelopeStyle> envelopeStyleQueryWrapper = new QueryWrapper<>();
             // 3.3 查询信件的样式url
             envelopeStyleQueryWrapper.eq("id", draftBox.getEnvelopeId());
+            envelopeStyleQueryWrapper.select("url_envelope");
             EnvelopeStyle envelopeStyle = envelopeStyleMapper.selectOne(envelopeStyleQueryWrapper);
             // 3.4 封装为vo对象
-            DraftBoxVO draftBoxVO = new DraftBoxVO();
-            BeanUtils.copyProperties(envelopeStyle, draftBoxVO);
-            BeanUtils.copyProperties(draftBox, draftBoxVO);
-            returnDraftBoxList.add(draftBoxVO);
+            DraftBoxEnvelopeVO draftBoxListVO = new DraftBoxEnvelopeVO();
+            BeanUtils.copyProperties(envelopeStyle, draftBoxListVO);
+            BeanUtils.copyProperties(draftBox, draftBoxListVO);
+            returnDraftBoxList.add(draftBoxListVO);
         }
 
         return returnDraftBoxList;
     }
 
     @Override
-    public boolean updateDraft(DraftBoxVO draftBoxVO, String openid) {
+    public boolean updateDraft(DraftBoxSaveVO draftBoxSaveVO, String openid) {
 
         // 1.获取user的id
         User writerUser = userUtil.getUserInfo(openid, "id");
 
         // 2.封装更新条件
         QueryWrapper<DraftBox> draftBoxQueryWrapper = new QueryWrapper<>();
-        draftBoxQueryWrapper.eq("id", draftBoxVO.getId());
+        draftBoxQueryWrapper.eq("id", draftBoxSaveVO.getId());
         draftBoxQueryWrapper.eq("writer_id", writerUser.getId());
 
         // 3.封装要更新的信息(为null的不会更新)
         DraftBox draftBox = new DraftBox();
         // 不允许更新样式
-        draftBoxVO.setEnvelopeId(null);
-        BeanUtils.copyProperties(draftBoxVO, draftBox);
+        draftBoxSaveVO.setEnvelopeId(null);
+        BeanUtils.copyProperties(draftBoxSaveVO, draftBox);
 
         // 4.更新草稿
         int update = draftBoxMapper.update(draftBox, draftBoxQueryWrapper);
@@ -160,8 +176,8 @@ public class DraftBoxServiceImpl extends ServiceImpl<DraftBoxMapper, DraftBox> i
 
         // 2.组装要存到数据库的草稿数据
         // 2.1 设置当前草稿为回信草稿
-        replyDraftVO.setIsReply(1);
         DraftBox draftBox = new DraftBox();
+        draftBox.setIsReply(1);
         // 2.2 组装用户信息
         draftBox.setWriterId(writerUser.getId());
         draftBox.setWriterNickName(writerUser.getNickName());
@@ -173,6 +189,40 @@ public class DraftBoxServiceImpl extends ServiceImpl<DraftBoxMapper, DraftBox> i
 
         // 为0则返回false
         return insert != 0;
+    }
+
+    @Override
+    public DraftBoxContentVO getDraftByDraftId(Integer id, String openid) {
+
+        // 1.获取user的id
+        User writerUser = userUtil.getUserInfo(openid, "id");
+
+        // 2.封装查询条件
+        QueryWrapper<DraftBox> draftBoxQueryWrapper = new QueryWrapper<>();
+        // 2.1 草稿id
+        draftBoxQueryWrapper.eq("id", id);
+        // 2.2 写草稿人的id
+        draftBoxQueryWrapper.eq("writer_id", writerUser.getId());
+
+        // 3.查询草稿内容
+        DraftBox draftBox = draftBoxMapper.selectOne(draftBoxQueryWrapper);
+
+        // 4.判断是否查出内容
+        if (draftBox == null) {
+            return null;
+        }
+
+        // 5.查出信纸样式url
+        QueryWrapper<EnvelopeStyle> envelopeStyleQueryWrapper = new QueryWrapper<>();
+        envelopeStyleQueryWrapper.eq("id", draftBox.getEnvelopeId());
+        EnvelopeStyle envelopeStyle = envelopeStyleMapper.selectOne(envelopeStyleQueryWrapper);
+
+        // 6.组装成vo
+        DraftBoxContentVO draftBoxContentVO = new DraftBoxContentVO();
+        draftBoxContentVO.setUrlPaper(envelopeStyle.getUrlPaper());
+        BeanUtils.copyProperties(draftBox, draftBoxContentVO);
+
+        return draftBoxContentVO;
     }
 
 }
