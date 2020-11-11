@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Profile;
  * @author XieZhiJie
  * @date 2020/11/11 13:03
  */
-@Profile("dev")
+@Profile("pro")
 @Configuration
 public class TomcatConfig {
 

@@ -11,7 +11,7 @@ server:
 spring:
   profiles:
     # 注意! 队员在自己本机上跑的时候, 注释掉下面一行
-    # active: dev
+    # active: pro
   application:
     name: server-listener
   datasource:
