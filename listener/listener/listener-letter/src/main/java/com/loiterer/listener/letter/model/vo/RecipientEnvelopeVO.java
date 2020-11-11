@@ -4,6 +4,7 @@ package com.loiterer.listener.letter.model.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 前后端进行收件箱数据交互时传输的数据
@@ -11,7 +12,7 @@ import java.io.Serializable;
  * @date 2020/11/09 22:50
  */
 @Data
-public class RecipientBoxVO implements Serializable {
+public class RecipientEnvelopeVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,22 +48,17 @@ public class RecipientBoxVO implements Serializable {
     private String title;
 
     /**
-     * 信件内容
-     */
-    private String content;
-
-    /**
      * 信封样式url
      */
     private String urlEnvelope;
 
     /**
-     * 信纸样式url
-     */
-    private String urlPaper;
-
-    /**
      * 信件已读标志
      */
     private Integer isRead;
+
+    /**
+     * 写信保存的时间
+     */
+    private Date gmtCreate;
 }

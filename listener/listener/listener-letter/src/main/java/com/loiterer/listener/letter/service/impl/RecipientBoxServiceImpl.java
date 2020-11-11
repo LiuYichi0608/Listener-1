@@ -7,7 +7,8 @@ import com.loiterer.listener.letter.mapper.EnvelopeStyleMapper;
 import com.loiterer.listener.letter.model.entity.EnvelopeStyle;
 import com.loiterer.listener.letter.model.entity.RecipientBox;
 import com.loiterer.listener.letter.mapper.RecipientBoxMapper;
-import com.loiterer.listener.letter.model.vo.RecipientBoxVO;
+import com.loiterer.listener.letter.model.vo.RecipientContentVO;
+import com.loiterer.listener.letter.model.vo.RecipientEnvelopeVO;
 import com.loiterer.listener.letter.service.RecipientBoxService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.loiterer.listener.letter.util.UserUtil;
@@ -61,7 +62,7 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
     }
 
     @Override
-    public List<RecipientBoxVO> getAllRecipientLettersByOpenid(String openid) {
+    public List<RecipientEnvelopeVO> getAllRecipientLettersByOpenid(String openid) {
 
         // 1.获取当前用户的id和昵称
         User recipientUser = userUtil.getUserInfo(openid, "id", "nick_name");
@@ -94,36 +95,7 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
     }
 
     @Override
-    public boolean updateRecipientLetter(Integer id, String openid) {
-        // 1.获取当前用户的id和昵称
-        User recipientUser = userUtil.getUserInfo(openid, "id", "nick_name");
-
-        // 2.通过用户id和信件id删除收件箱信件
-        // 2.1 封装查询条件
-        QueryWrapper<RecipientBox> recipientBoxQueryWrapper = new QueryWrapper<>();
-        recipientBoxQueryWrapper.eq("recipient_id", recipientUser.getId());
-        recipientBoxQueryWrapper.eq("id", id);
-        // 2.2 执行查询条件, 找到与用户id和信件id相匹配的收信箱信件
-        RecipientBox recipientBox = recipientBoxMapper.selectOne(recipientBoxQueryWrapper);
-
-        // 3.判断查找到的信件是否为null, 以确定用户id和信件id是否正确以及信件是否存在
-        if(recipientBox == null){
-            return false;
-        }
-        // 4.判断信件的已读未读状态, 如果recipientBox.getIsRead()为0则更改为1,否则直接返回true
-        if(recipientBox.getIsRead() == 0){
-            // 把未读状态改为已读
-            recipientBox.setIsRead(1);
-            // 执行更新操作, 对用户id和信件id相匹配的收信箱信件的阅读状态进行更改
-            int updateRow = recipientBoxMapper.update(recipientBox,recipientBoxQueryWrapper);
-            // 通过判断更新记录数目, 来确定是否完成更新
-            return updateRow == 1;
-        }
-        return true;
-    }
-
-    @Override
-    public List<RecipientBoxVO> getPageRecipientLettersByOpenid(String openid) {
+    public List<RecipientEnvelopeVO> getPageRecipientLettersByOpenid(String openid) {
         // 1.获取当前用户的id和昵称
         User recipientUser = userUtil.getUserInfo(openid, "id", "nick_name");
 
@@ -142,14 +114,57 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
         return getRecipientBoxVO(recipientBoxList);
     }
 
+    @Override
+    public RecipientContentVO getRecipientLetterById(Integer id, String openid) {
+        // 1.获取当前用户的id和昵称
+        User recipientUser = userUtil.getUserInfo(openid, "id", "nick_name");
+
+        // 2.通过用户id查找用户所有的信件信息
+        // 2.1 封装查询条件
+        QueryWrapper<RecipientBox> recipientBoxQueryWrapper = new QueryWrapper<>();
+        recipientBoxQueryWrapper.eq("recipient_id", recipientUser.getId());
+        recipientBoxQueryWrapper.eq("id", id);
+        // 2.2 执行查询条件, 找到与用户id和信件id相匹配的收信箱信件
+        RecipientBox recipientBox = recipientBoxMapper.selectOne(recipientBoxQueryWrapper);
+
+        // 3.判断是否获取信件成功
+        if(recipientBox != null){
+            // 4.判断信件已读状态
+            if(recipientBox.getIsRead() == 0){
+                // 把未读状态改为已读
+                recipientBox.setIsRead(1);
+                // 执行更新操作, 对用户id和信件id相匹配的收信箱信件的阅读状态进行更改
+                recipientBoxMapper.update(recipientBox,recipientBoxQueryWrapper);
+                // 通过判断更新记录数目, 来确定是否完成更新
+            }
+
+            // 5.通过信件中的信封样式id获取相应的url
+            QueryWrapper<EnvelopeStyle> envelopeStyleQueryWrapper = new QueryWrapper<>();
+            // 5.1封装信件样式查询条件
+            envelopeStyleQueryWrapper.eq("id",recipientBox.getEnvelopeId());
+            // 5.2根据信件样式查询条件进行查询
+            EnvelopeStyle envelopeStyle = envelopeStyleMapper.selectOne(envelopeStyleQueryWrapper);
+
+            // 6.生成recipientBoxVO类进行数据存放
+            RecipientContentVO recipientContentVO = new RecipientContentVO();
+            // 6.1复制envelopeStyle内容到recipientBoxVO
+            BeanUtils.copyProperties(envelopeStyle, recipientContentVO);
+            // 6.2复制recipientBox内容到recipientBoxVO
+            BeanUtils.copyProperties(recipientBox, recipientContentVO);
+
+            return recipientContentVO;
+        }
+        return null;
+    }
+
 
     /**
      * 把recipientBoxList集合中的相同的内容复制到List<RecipientBoxVO>
      * @param recipientBoxList 收件箱信件集合
      * @return 收件箱信件VO集合
      */
-    public List<RecipientBoxVO> getRecipientBoxVO(List<RecipientBox> recipientBoxList){
-        List<RecipientBoxVO> recipientBoxVOList = new ArrayList<>();
+    public List<RecipientEnvelopeVO> getRecipientBoxVO(List<RecipientBox> recipientBoxList){
+        List<RecipientEnvelopeVO> recipientEnvelopeVOList = new ArrayList<>();
         for (RecipientBox recipientBox : recipientBoxList) {
             // 通过信件中的信封样式id获取相应的url
             QueryWrapper<EnvelopeStyle> envelopeStyleQueryWrapper = new QueryWrapper<>();
@@ -158,15 +173,15 @@ public class RecipientBoxServiceImpl extends ServiceImpl<RecipientBoxMapper, Rec
             // 根据信件样式查询条件进行查询
             EnvelopeStyle envelopeStyle = envelopeStyleMapper.selectOne(envelopeStyleQueryWrapper);
             // 生成recipientBoxVO类进行数据存放
-            RecipientBoxVO recipientBoxVO = new RecipientBoxVO();
+            RecipientEnvelopeVO recipientEnvelopeVO = new RecipientEnvelopeVO();
             // 复制envelopeStyle内容到recipientBoxVO
-            BeanUtils.copyProperties(envelopeStyle,recipientBoxVO);
+            BeanUtils.copyProperties(envelopeStyle, recipientEnvelopeVO);
             // 复制recipientBox内容到recipientBoxVO
-            BeanUtils.copyProperties(recipientBox, recipientBoxVO);
+            BeanUtils.copyProperties(recipientBox, recipientEnvelopeVO);
             // 把recipientBox添加到集合
-            recipientBoxVOList.add(recipientBoxVO);
+            recipientEnvelopeVOList.add(recipientEnvelopeVO);
         }
-        return recipientBoxVOList;
+        return recipientEnvelopeVOList;
 
     }
 
