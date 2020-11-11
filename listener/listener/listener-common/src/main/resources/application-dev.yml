@@ -1,0 +1,9 @@
+# 开启https, 配置跟证书对应
+server:
+  ssl:
+    enabled: true
+    key-store: classpath:temp.tanjiaming99.com.jks
+    # server.ssl.key-store-type=JKS
+    key-store-type: JKS
+    # 密码
+    key-store-password: ENC(KVmKNlKUkHaSARBqv3YeIUEEZgGuJOCi)
