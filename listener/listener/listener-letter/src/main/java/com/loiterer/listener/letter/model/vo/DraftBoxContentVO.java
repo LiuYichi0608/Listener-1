@@ -12,7 +12,7 @@ import java.util.Date;
  * @date 2020/11/10 14:42
  */
 @Data
-public class DraftBoxVO implements Serializable {
+public class DraftBoxContentVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,6 +27,16 @@ public class DraftBoxVO implements Serializable {
     private String writerNickName;
 
     /**
+     * 收信人id
+     */
+    private Integer recipientId;
+
+    /**
+     * 收信人昵称
+     */
+    private String recipientNickName;
+
+    /**
      * 草稿标题
      */
     private String title;
@@ -35,16 +45,6 @@ public class DraftBoxVO implements Serializable {
      * 草稿内容
      */
     private String content;
-
-    /**
-     * 草稿样式id
-     */
-    private Integer envelopeId;
-
-    /**
-     * 信封样式url
-     */
-    private String urlEnvelope;
 
     /**
      * 信纸样式url
@@ -62,7 +62,7 @@ public class DraftBoxVO implements Serializable {
     private Date gmtCreate;
 
     /**
-     * 草稿最进一次修改的时间
+     * 草稿最近一次修改的时间
      */
     private Date gmtModified;
 
