@@ -1,3 +1,5 @@
+http:
+  port: 8443
 server:
   # 端口号
   port: 8080
@@ -7,6 +9,9 @@ server:
 
 # spring config
 spring:
+  profiles:
+    # 注意! 队员在自己本机上跑的时候, 注释掉下面一行
+    # active: dev
   application:
     name: server-listener
   datasource:
