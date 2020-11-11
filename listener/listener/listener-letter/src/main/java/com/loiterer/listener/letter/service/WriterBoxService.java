@@ -3,7 +3,9 @@ package com.loiterer.listener.letter.service;
 import com.loiterer.listener.letter.model.entity.WriterBox;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.loiterer.listener.letter.model.vo.ReplyLetterVO;
-import com.loiterer.listener.letter.model.vo.WriterBoxVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxContentVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxEnvelopeVO;
+import com.loiterer.listener.letter.model.vo.WriterBoxSaveVO;
 
 import java.util.List;
 
@@ -23,14 +25,14 @@ public interface WriterBoxService extends IService<WriterBox> {
      * @param openid          用户的openid
      * @return                如果保存成功则返回true, 否则返回false
      */
-    boolean writeLetter(WriterBoxVO writerBoxSaveVO, String openid);
+    boolean writeLetter(WriterBoxSaveVO writerBoxSaveVO, String openid);
 
     /**
      * 通过用户的openid获取用户所有自己写的信件
      * @param openid 用户的openid
      * @return       返回用户所有自己写的信件
      */
-    List<WriterBoxVO> getAllWriterLettersByOpenid(String openid);
+    List<WriterBoxEnvelopeVO> getAllWriterLettersByOpenid(String openid);
 
     /**
      * 根据信件id和用户openid删除属于这个用户的信件
@@ -47,5 +49,13 @@ public interface WriterBoxService extends IService<WriterBox> {
      * @return              返回是否保存成功, 保存成功返回true, 否则返回false
      */
     boolean saveReplyLetter(ReplyLetterVO replyLetterVO, String openid);
+
+    /**
+     * 获取一封信的具体内容
+     * @param id     信件id
+     * @param openid 用户的openid
+     * @return       返回一封信的具体信息
+     */
+    WriterBoxContentVO getLetterByLetterId(Integer id, String openid);
 
 }
