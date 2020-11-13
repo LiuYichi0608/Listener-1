@@ -13,6 +13,8 @@ import com.loiterer.listener.common.util.ParameterVerificationUtil;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * <p>
  *  前端控制器
@@ -49,6 +51,15 @@ public class EnvelopeStyleController {
         }
         EnvelopeStyle envelopeStyle = envelopeStyleService.getById(id);
         return ResultEntity.success().data("envelopeStyle", envelopeStyle);
+    }
+
+    @GetMapping("/get/all/envelope/style")
+    public ResultEntity getAllEnvelopeStyle() {
+        // 获取所有的样式信息
+        List<EnvelopeStyle> envelopeStyles = envelopeStyleService.list();
+
+        // 返回
+        return ResultEntity.success().data("envelopeStyles", envelopeStyles);
     }
 
 }
