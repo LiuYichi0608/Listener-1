@@ -8,6 +8,7 @@ import com.loiterer.listener.user.model.dto.LoginDTO;
 import com.loiterer.listener.user.model.dto.UserInfoDTO;
 import com.loiterer.listener.user.model.entity.WeChatSession;
 import com.loiterer.listener.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
  * @author cmt
  * @date 2020/10/21
  */
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -49,6 +51,7 @@ public class UserServiceImpl implements UserService {
             Gson gson = new Gson();
             WeChatSession weChatSession = gson.fromJson(responseEntity.getBody(), WeChatSession.class);
 
+            log.info("errorCode: " + weChatSession.getErrcode());
             String openid = weChatSession.getOpenid();
             // 请求微信授权成功
             if (StringUtils.isEmpty(weChatSession.getErrcode())) {
