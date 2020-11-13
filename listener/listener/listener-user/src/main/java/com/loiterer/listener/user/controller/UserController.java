@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * 用户的 controller 层
@@ -28,11 +29,13 @@ public class UserController {
     /**
      * 用户登录
      *
-     * @param code 登录凭证
+     * @param map map集合，存储了用户的登录凭证
      * @return 如果登录成功，则返回 openid 和 token；否则返回错误信息
      */
     @PostMapping("/login")
-    public ResultEntity login(@RequestParam("code") String code) {
+    public ResultEntity login(@RequestBody Map<String, String> map) {
+        String code = map.get("code");
+        log.info("code: " + code);
         if (StringUtils.isEmpty(code)) {
             return ResultEntity.fail().message("登录凭证code为空");
         }
@@ -50,8 +53,8 @@ public class UserController {
      * @param request     http请求对象
      * @param userInfoDTO 用户信息
      */
-    @PostMapping("/insertUserInfo")
-    public ResultEntity insertUserInfo(HttpServletRequest request, UserInfoDTO userInfoDTO) {
+    @PostMapping(value = "/insertUserInfo")
+    public ResultEntity insertUserInfo(HttpServletRequest request, @RequestBody UserInfoDTO userInfoDTO) {
         log.info(userInfoDTO.toString());
         String token = request.getHeader("token");
         UserInfoDTO userInfo = userService.insertUserInfo(userInfoDTO, token);
