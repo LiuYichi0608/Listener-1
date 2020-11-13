@@ -35,9 +35,9 @@ public class JwtUtil {
      * @return 返回 token
      */
     public String getToken(String openid) {
-        // 设置 token 过期时间为7天
+        // 设置 token 过期时间为1天
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 7);
+        calendar.add(Calendar.DATE, 1);
 
         return JWT.create()
                 // 声明 openid
