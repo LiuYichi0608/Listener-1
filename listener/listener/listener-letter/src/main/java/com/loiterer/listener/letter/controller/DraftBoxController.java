@@ -199,5 +199,31 @@ public class DraftBoxController {
         return ResultEntity.success().data("draftBoxContent", draftBoxContentVO);
     }
 
+    /**
+     * 根据收信id, 获取到用户要回复这封信的草稿
+     * @param id      收信id
+     * @param request 从request中获取token并获取到用户的openid
+     * @return        返回要回这封信的草稿
+     */
+    @GetMapping("/get/draft/by/letter/id/{id}")
+    public ResultEntity getDraftByLetterId(
+            @PathVariable("id") Integer id,
+            HttpServletRequest request
+    ) {
+
+        // 1.获取用户的openid
+        String openid = jwtUtil.getOpenid(request.getHeader("token"));
+
+        // 2.使用service获取一封草稿的内容
+        DraftBoxContentVO draftBoxContentVO = draftBoxService.getDraftByLetterId(id, openid);
+
+        // 3.获取失败返回失败信息, 否则返回信件内容与成功信息
+        if (draftBoxContentVO == null) {
+            return ResultEntity.fail().message("获取草稿信息失败!");
+        }
+
+        return ResultEntity.success().data("draftBoxContent", draftBoxContentVO);
+    }
+
 }
 

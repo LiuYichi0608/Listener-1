@@ -53,6 +53,10 @@ public class EnvelopeStyleController {
         return ResultEntity.success().data("envelopeStyle", envelopeStyle);
     }
 
+    /**
+     * 获取所有的信封样式信息
+     * @return 返回所有的样式信息
+     */
     @GetMapping("/get/all/envelope/style")
     public ResultEntity getAllEnvelopeStyle() {
         // 获取所有的样式信息

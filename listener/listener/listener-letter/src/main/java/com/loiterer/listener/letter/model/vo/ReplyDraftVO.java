@@ -40,4 +40,9 @@ public class ReplyDraftVO implements Serializable {
      */
     private Integer envelopeId;
 
+    /**
+     * 要回复的那封信的id
+     */
+    private Integer replyId;
+
 }

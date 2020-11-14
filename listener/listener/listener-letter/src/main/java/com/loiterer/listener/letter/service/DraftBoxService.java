@@ -66,4 +66,11 @@ public interface DraftBoxService extends IService<DraftBox> {
      */
     DraftBoxContentVO getDraftByDraftId(Integer id, String openid);
 
+    /**
+     * 根据收信id, 获取到我要回复这封信的草稿
+     * @param id     收信id
+     * @param openid 用户的openid
+     * @return       返回一封草稿的具体信息
+     */
+    DraftBoxContentVO getDraftByLetterId(Integer id, String openid);
 }
