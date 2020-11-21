@@ -20,12 +20,12 @@ import lombok.EqualsAndHashCode;
 @TableName("t_envelope_style")
 public class EnvelopeStyle implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 信件样式id
      */
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**

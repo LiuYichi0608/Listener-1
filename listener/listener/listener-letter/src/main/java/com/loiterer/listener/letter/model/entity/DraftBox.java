@@ -84,4 +84,9 @@ public class DraftBox implements Serializable {
      */
     private Integer isReply;
 
+    /**
+     * 要回复的那封信的id
+     */
+    private Integer replyId;
+
 }

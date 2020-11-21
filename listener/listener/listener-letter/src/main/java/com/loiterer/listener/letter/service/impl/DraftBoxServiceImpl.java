@@ -204,7 +204,31 @@ public class DraftBoxServiceImpl extends ServiceImpl<DraftBoxMapper, DraftBox> i
         // 2.2 写草稿人的id
         draftBoxQueryWrapper.eq("writer_id", writerUser.getId());
 
-        // 3.查询草稿内容
+        // 3.查询草稿内容并返回
+        return getDraftContent(draftBoxQueryWrapper);
+    }
+
+    @Override
+    public DraftBoxContentVO getDraftByLetterId(Integer id, String openid) {
+
+        // 1.获取user的id
+        User writerUser = userUtil.getUserInfo(openid, "id");
+
+        // 2.封装查询条件
+        QueryWrapper<DraftBox> draftBoxQueryWrapper = new QueryWrapper<>();
+        // 2.1 写草稿人的id
+        draftBoxQueryWrapper.eq("writer_id", writerUser.getId());
+        // 2.2 草稿回的是那封信的id
+        draftBoxQueryWrapper.eq("reply_id", id);
+        // 2.3 该草稿要是回复信件的草稿
+        draftBoxQueryWrapper.eq("is_reply", 1);
+
+        // 3.查询草稿内容并返回
+        return getDraftContent(draftBoxQueryWrapper);
+    }
+
+
+    private DraftBoxContentVO getDraftContent(QueryWrapper<DraftBox> draftBoxQueryWrapper) {
         DraftBox draftBox = draftBoxMapper.selectOne(draftBoxQueryWrapper);
 
         // 4.判断是否查出内容
